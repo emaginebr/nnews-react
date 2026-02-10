@@ -64,7 +64,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "preversion": "npm run build",
-    "prepublishOnly": "npm version patch",
+    "prepublishOnly": "npm run build",
     "type-check": "tsc --noEmit"
   },
   "peerDependencies": {
