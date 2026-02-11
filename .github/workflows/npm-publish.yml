@@ -22,6 +22,9 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        fetch-tags: true
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -38,7 +41,7 @@ jobs:
         if [ -n "${{ github.event.inputs.version }}" ]; then
           VERSION="${{ github.event.inputs.version }}"
         else
-          VERSION="${GITHUB_REF_NAME#v}"
+          VERSION=$(git describe --tags --abbrev=0 | sed 's/^v//')
         fi
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "Publishing version: $VERSION"
