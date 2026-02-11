@@ -1,9 +1,12 @@
 name: Publish to NPM
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_run:
+    workflows: ["Version and Tag"]
+    types:
+      - completed
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       version:
