@@ -34,12 +34,14 @@ export default defineConfig({
         'react-dom',
         'react/jsx-runtime',
         'react-router-dom',
+        'nauth-react',
       ],
       output: {
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',
           'react-router-dom': 'ReactRouterDOM',
+          'nauth-react': 'NAuthReact',
         },
         assetFileNames: (assetInfo) => {
           if (assetInfo.name === 'style.css') return 'style.css';

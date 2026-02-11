@@ -1,12 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { RichTextEditor } from './RichTextEditor';
 import { ArticleStatus } from '../types/news';
 import type { Article, ArticleInput, ArticleUpdate, Category } from '../types/news';
 import { useNNews } from '../contexts/NNewsContext';
 
+export interface RoleOption {
+    roleId: number;
+    slug: string;
+    name: string;
+}
+
 export interface ArticleEditorProps {
     article?: Article | null;
     categories?: Category[];
+    availableRoles?: RoleOption[];
+    onFetchRoles?: () => Promise<RoleOption[]>;
     onSave: (article: ArticleInput | ArticleUpdate) => Promise<void>;
     onCancel: () => void;
     loading?: boolean;
@@ -15,6 +23,8 @@ export interface ArticleEditorProps {
 export function ArticleEditor({
     article,
     categories = [],
+    availableRoles,
+    onFetchRoles,
     onSave,
     onCancel,
     loading = false,
@@ -29,7 +39,10 @@ export function ArticleEditor({
     const [categoryId, setCategoryId] = useState<number | null>(null);
     const [dateAt, setDateAt] = useState<string>('');
     const [tagList, setTagList] = useState<string>('');
-    const [roleIds, setRoleIds] = useState<string>('');
+    const [visibleToAll, setVisibleToAll] = useState(true);
+    const [selectedRoleSlugs, setSelectedRoleSlugs] = useState<Set<string>>(new Set());
+    const [fetchedRoles, setFetchedRoles] = useState<RoleOption[]>([]);
+    const [rolesLoading, setRolesLoading] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
     useEffect(() => {
@@ -45,9 +58,57 @@ export function ArticleEditor({
             setCategoryId(article.categoryId || null);
             setDateAt(article.dateAt ? new Date(article.dateAt).toISOString().slice(0, 16) : '');
             setTagList(article.tags?.map((t) => t.title).join(', ') || '');
-            setRoleIds(article.roles?.map((r) => r.slug).join(', ') || '');
+            if (article.roles && article.roles.length > 0) {
+                setVisibleToAll(false);
+                setSelectedRoleSlugs(new Set(article.roles.map((r) => r.slug)));
+            } else {
+                setVisibleToAll(true);
+                setSelectedRoleSlugs(new Set());
+            }
         }
     }, [article]);
+
+    const displayRoles = availableRoles || fetchedRoles;
+
+    useEffect(() => {
+        if (availableRoles && availableRoles.length > 0) return;
+        if (!onFetchRoles) return;
+
+        let cancelled = false;
+        setRolesLoading(true);
+        onFetchRoles()
+            .then((roles) => {
+                if (!cancelled) {
+                    setFetchedRoles(roles);
+                }
+            })
+            .catch((err) => {
+                console.warn('Failed to fetch roles:', err);
+            })
+            .finally(() => {
+                if (!cancelled) setRolesLoading(false);
+            });
+        return () => { cancelled = true; };
+    }, [availableRoles, onFetchRoles]);
+
+    const handleVisibleToAllChange = useCallback((checked: boolean) => {
+        setVisibleToAll(checked);
+        if (checked) {
+            setSelectedRoleSlugs(new Set());
+        }
+    }, []);
+
+    const handleRoleToggle = useCallback((slug: string) => {
+        setSelectedRoleSlugs((prev) => {
+            const next = new Set(prev);
+            if (next.has(slug)) {
+                next.delete(slug);
+            } else {
+                next.add(slug);
+            }
+            return next;
+        });
+    }, []);
 
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {};
@@ -71,10 +132,7 @@ export function ArticleEditor({
             return;
         }
 
-        const roles = roleIds
-            .split(',')
-            .map((r) => r.trim())
-            .filter((r) => r.length > 0);
+        const roles = visibleToAll ? [] : Array.from(selectedRoleSlugs);
 
         const articleData = {
             title: title.trim(),
@@ -301,22 +359,59 @@ export function ArticleEditor({
                 </p>
             </div>
 
-            {/* Roles */}
-            <div className="space-y-2">
-                <label htmlFor="roles" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Roles
+            {/* Visibilidade / Roles */}
+            <div className="space-y-3">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Visibilidade
                 </label>
-                <input
-                    id="roles"
-                    type="text"
-                    value={roleIds}
-                    onChange={(e) => setRoleIds(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-4 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    placeholder="Enter role slugs separated by commas (e.g., admin, editor)"
-                />
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Comma-separated list of role slugs.
-                </p>
+
+                <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                        type="checkbox"
+                        checked={visibleToAll}
+                        onChange={(e) => handleVisibleToAllChange(e.target.checked)}
+                        className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                        Vis&#237;vel para todos
+                    </span>
+                </label>
+
+                {!visibleToAll && (
+                    <div className="ml-6 space-y-2">
+                        {rolesLoading ? (
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                Carregando perfis...
+                            </p>
+                        ) : displayRoles.length > 0 ? (
+                            <div className="space-y-2">
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                    Selecione os perfis que podem visualizar este artigo:
+                                </p>
+                                {displayRoles.map((role) => (
+                                    <label
+                                        key={role.slug}
+                                        className="flex items-center gap-2 cursor-pointer"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedRoleSlugs.has(role.slug)}
+                                            onChange={() => handleRoleToggle(role.slug)}
+                                            className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
+                                        />
+                                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                                            {role.name}
+                                        </span>
+                                    </label>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                Nenhum perfil dispon&#237;vel.
+                            </p>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Action Buttons */}

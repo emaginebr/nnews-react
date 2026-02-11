@@ -70,7 +70,8 @@
   "peerDependencies": {
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
-    "react-router-dom": "^6.30.0"
+    "react-router-dom": "^6.30.0",
+    "nauth-react": "^0.2.8"
   },
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^4.6.2",
