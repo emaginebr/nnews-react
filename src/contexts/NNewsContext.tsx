@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo } from 'react';
+import React, { createContext, useContext, useMemo, useRef, useEffect } from 'react';
 import axios, { type AxiosInstance } from 'axios';
 import { ArticleAPI } from '../services/article-api';
 import { CategoryAPI } from '../services/category-api';
@@ -26,6 +26,16 @@ export interface NNewsProviderProps {
 }
 
 export function NNewsProvider({ config, children }: NNewsProviderProps) {
+  // Keep a mutable ref so the interceptor always reads the latest config
+  const configRef = useRef(config);
+  useEffect(() => {
+    configRef.current = config;
+    console.log('[NNews] Config updated:', {
+      apiUrl: config.apiUrl,
+      hasAuthHeader: !!config.headers?.Authorization,
+    });
+  }, [config]);
+
   const contextValue = useMemo(() => {
     const apiClient =
       config.apiClient ||
@@ -33,14 +43,14 @@ export function NNewsProvider({ config, children }: NNewsProviderProps) {
         baseURL: config.apiUrl,
         headers: {
           'Content-Type': 'application/json',
-          ...config.headers,
         },
       });
 
     // Interceptor to inject dynamic headers (e.g. Authorization token) on every request
     apiClient.interceptors.request.use((requestConfig) => {
-      if (config.headers) {
-        Object.entries(config.headers).forEach(([key, value]) => {
+      const currentHeaders = configRef.current.headers;
+      if (currentHeaders) {
+        Object.entries(currentHeaders).forEach(([key, value]) => {
           if (value) {
             requestConfig.headers.set(key, value);
           }
@@ -70,7 +80,8 @@ export function NNewsProvider({ config, children }: NNewsProviderProps) {
       categoryApi,
       tagApi,
     };
-  }, [config]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config.apiUrl, config.apiClient]);
 
   return (
     <NNewsContext.Provider value={contextValue}>
