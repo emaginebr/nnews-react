@@ -37,6 +37,28 @@ export function NNewsProvider({ config, children }: NNewsProviderProps) {
         },
       });
 
+    // Interceptor to inject dynamic headers (e.g. Authorization token) on every request
+    apiClient.interceptors.request.use((requestConfig) => {
+      if (config.headers) {
+        Object.entries(config.headers).forEach(([key, value]) => {
+          if (value) {
+            requestConfig.headers.set(key, value);
+          }
+        });
+      }
+
+      console.log('[NNews] Request interceptor:', {
+        method: requestConfig.method?.toUpperCase(),
+        url: `${requestConfig.baseURL || ''}${requestConfig.url || ''}`,
+        headers: {
+          Authorization: requestConfig.headers?.Authorization || '(not set)',
+          'Content-Type': requestConfig.headers?.['Content-Type'] || '(not set)',
+        },
+      });
+
+      return requestConfig;
+    });
+
     const articleApi = new ArticleAPI(apiClient);
     const categoryApi = new CategoryAPI(apiClient);
     const tagApi = new TagAPI(apiClient);
