@@ -83,7 +83,7 @@ export interface ArticleInput {
   categoryId?: number;
   dateAt?: string | Date;
   tagList?: string;
-  roleIds?: string[];
+  roles?: string[];
 }
 
 export interface ArticleUpdate extends ArticleInput {
@@ -135,19 +135,19 @@ export interface NewsApiError {
 
 export const NEWS_API_ENDPOINTS = {
   // Articles
-  ARTICLES: '/api/article',
-  ARTICLES_FILTER: '/api/article/filter',
-  ARTICLE_BY_ID: (id: number) => `/api/article/${id}`,
+  ARTICLES: '/article',
+  ARTICLES_FILTER: '/article/filter',
+  ARTICLE_BY_ID: (id: number) => `/article/${id}`,
 
   // Categories
-  CATEGORIES: '/api/category',
-  CATEGORIES_FILTER: '/api/category/filter',
-  CATEGORY_BY_ID: (id: number) => `/api/category/${id}`,
+  CATEGORIES: '/category',
+  CATEGORIES_FILTER: '/category/filter',
+  CATEGORY_BY_ID: (id: number) => `/category/${id}`,
 
   // Tags
-  TAGS: '/api/tag',
-  TAG_BY_ID: (id: number) => `/api/tag/${id}`,
-  TAG_MERGE: '/api/tag/merge',
+  TAGS: '/tag',
+  TAG_BY_ID: (id: number) => `/tag/${id}`,
+  TAG_MERGE: '/tag/merge',
 } as const;
 
 // ============================================================================

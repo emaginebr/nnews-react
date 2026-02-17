@@ -142,7 +142,7 @@ export function ArticleEditor({
             categoryId: categoryId || undefined,
             dateAt: dateAt || undefined,
             tagList: tagList.trim() || undefined,
-            roleIds: roles.length > 0 ? roles : undefined,
+            roles: roles.length > 0 ? roles : undefined,
         };
 
         if (article) {

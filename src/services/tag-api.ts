@@ -2,9 +2,9 @@ import type { AxiosInstance } from 'axios';
 import type { Tag, TagInput, TagUpdate } from '../types/news';
 
 const NEWS_API_ENDPOINTS = {
-  TAGS: '/api/tag',
-  TAG_BY_ID: (id: number) => `/api/tag/${id}`,
-  TAG_MERGE: (sourceId: number, targetId: number) => `/api/Tag/merge/${sourceId}/${targetId}`,
+  TAGS: '/tag',
+  TAG_BY_ID: (id: number) => `/tag/${id}`,
+  TAG_MERGE: (sourceId: number, targetId: number) => `/Tag/merge/${sourceId}/${targetId}`,
 };
 
 export class TagAPI {

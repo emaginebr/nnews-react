@@ -2,12 +2,12 @@ import type { AxiosInstance } from 'axios';
 import type { Article, ArticleInput, ArticleUpdate, PagedResult, AIArticleRequest } from '../types/news';
 
 const NEWS_API_ENDPOINTS = {
-  ARTICLES: '/api/article',
-  ARTICLES_FILTER: '/api/article/filter',
-  ARTICLE_BY_ID: (id: number) => `/api/article/${id}`,
-  IMAGE_UPLOAD: '/api/Image/uploadImage',
-  INSERT_WITH_AI: '/api/article/insertWithAI',
-  UPDATE_WITH_AI: '/api/article/updateWithAI',
+  ARTICLES: '/article',
+  ARTICLES_FILTER: '/article/filter',
+  ARTICLE_BY_ID: (id: number) => `/article/${id}`,
+  IMAGE_UPLOAD: '/Image/uploadImage',
+  INSERT_WITH_AI: '/article/insertWithAI',
+  UPDATE_WITH_AI: '/article/updateWithAI',
 };
 
 export class ArticleAPI {

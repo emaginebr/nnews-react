@@ -2,9 +2,9 @@ import type { AxiosInstance } from 'axios';
 import type { Category, CategoryInput, CategoryUpdate } from '../types/news';
 
 const NEWS_API_ENDPOINTS = {
-  CATEGORIES: '/api/category',
-  CATEGORIES_FILTER: '/api/category/filter',
-  CATEGORY_BY_ID: (id: number) => `/api/category/${id}`,
+  CATEGORIES: '/category',
+  CATEGORIES_FILTER: '/category/filter',
+  CATEGORY_BY_ID: (id: number) => `/category/${id}`,
 };
 
 export class CategoryAPI {
