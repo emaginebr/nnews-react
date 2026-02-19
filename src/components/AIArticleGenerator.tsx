@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Article, AIArticleRequest } from '../types/news';
 import { useNNews } from '../contexts/NNewsContext';
+import { useNNewsTranslation } from '../i18n';
 
 export interface AIArticleGeneratorProps {
     mode: 'create' | 'update';
@@ -18,6 +19,7 @@ export function AIArticleGenerator({
     onClose,
 }: AIArticleGeneratorProps) {
     const { articleApi } = useNNews();
+    const { t } = useNNewsTranslation();
     const [prompt, setPrompt] = useState('');
     const [generateImage, setGenerateImage] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -26,15 +28,15 @@ export function AIArticleGenerator({
 
     const validatePrompt = (): boolean => {
         if (!prompt.trim()) {
-            setError('Prompt is required');
+            setError(t('validation.promptRequired'));
             return false;
         }
         if (prompt.trim().length < 10) {
-            setError('Prompt must be at least 10 characters long');
+            setError(t('validation.promptMinLength'));
             return false;
         }
         if (prompt.length > 2000) {
-            setError('Prompt must be less than 2000 characters');
+            setError(t('validation.promptMaxLength'));
             return false;
         }
         return true;
@@ -46,13 +48,13 @@ export function AIArticleGenerator({
         }
 
         if (mode === 'update' && !articleId) {
-            setError('Article ID is required for update mode');
+            setError(t('validation.articleIdRequired'));
             return;
         }
 
         setLoading(true);
         setError(null);
-        setProgress(mode === 'create' ? 'Creating article with AI...' : 'Updating article with AI...');
+        setProgress(mode === 'create' ? t('aiGenerator.creatingWithAI') : t('aiGenerator.updatingWithAI'));
 
         try {
             const request: AIArticleRequest = {
@@ -62,7 +64,7 @@ export function AIArticleGenerator({
             };
 
             if (generateImage) {
-                setProgress('Generating content and image with AI... This may take a few moments.');
+                setProgress(t('aiGenerator.generatingContentImage'));
             }
 
             let result: Article;
@@ -74,14 +76,14 @@ export function AIArticleGenerator({
 
             setProgress('');
             onSuccess(result);
-            
+
             // Reset form on success
             setPrompt('');
             setGenerateImage(false);
             onClose();
         } catch (err: any) {
             console.error('Error generating article with AI:', err);
-            setError(err.message || 'Failed to generate article with AI. Please try again.');
+            setError(err.message || t('aiGenerator.generationFailed'));
             setProgress('');
         } finally {
             setLoading(false);
@@ -98,8 +100,8 @@ export function AIArticleGenerator({
     };
 
     const promptPlaceholder = mode === 'create'
-        ? 'Describe the article you want to create (e.g., "Write a comprehensive article about AI trends in 2024, including ChatGPT-4, Gemini, and practical applications in different industries")'
-        : 'Describe the changes you want to make (e.g., "Add a new section about the latest ChatGPT-4 updates launched in January 2024 and improve the introduction to make it more engaging")';
+        ? t('aiGenerator.createPlaceholder')
+        : t('aiGenerator.updatePlaceholder');
 
     const getTextareaClassName = () => {
         const baseClasses = 'w-full rounded-md border px-4 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed';
@@ -113,7 +115,7 @@ export function AIArticleGenerator({
         <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div className="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
                 {/* Backdrop */}
-                <div 
+                <div
                     className="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-75 transition-opacity"
                     onClick={handleClose}
                 ></div>
@@ -131,12 +133,12 @@ export function AIArticleGenerator({
                                 </div>
                                 <div>
                                     <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100" id="modal-title">
-                                        {mode === 'create' ? 'Create Article with AI' : 'Update Article with AI'}
+                                        {mode === 'create' ? t('aiGenerator.createTitle') : t('aiGenerator.updateTitle')}
                                     </h3>
                                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                         {mode === 'create'
-                                            ? 'Use AI to generate a complete article with title, content, and tags based on your description.'
-                                            : 'Use AI to modify the existing article content based on your instructions.'}
+                                            ? t('aiGenerator.createDescription')
+                                            : t('aiGenerator.updateDescription')}
                                     </p>
                                 </div>
                             </div>
@@ -146,7 +148,7 @@ export function AIArticleGenerator({
                                 disabled={loading}
                                 className="rounded-md text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 disabled:opacity-50"
                             >
-                                <span className="sr-only">Close</span>
+                                <span className="sr-only">{t('common.close')}</span>
                                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                 </svg>
@@ -157,7 +159,7 @@ export function AIArticleGenerator({
                         <div className="space-y-4">
                             <div className="space-y-2">
                                 <label htmlFor="prompt" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Description / Instructions *
+                                    {t('aiGenerator.descriptionLabel')}
                                 </label>
                                 <textarea
                                     id="prompt"
@@ -172,7 +174,7 @@ export function AIArticleGenerator({
                                 />
                                 <div className="flex justify-between items-center">
                                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                                        {prompt.length} / 2000 characters (minimum 10)
+                                        {t('aiGenerator.characterCount', { count: prompt.length })}
                                     </p>
                                     {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
                                 </div>
@@ -188,11 +190,11 @@ export function AIArticleGenerator({
                                         className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                     />
                                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Generate image with DALL-E 3
+                                        {t('aiGenerator.generateImage')}
                                     </span>
                                 </label>
                                 <p className="text-xs text-gray-500 dark:text-gray-400 ml-6">
-                                    AI will create an illustrative image for the article. This may take a few extra seconds.
+                                    {t('aiGenerator.generateImageHint')}
                                 </p>
                             </div>
 
@@ -206,7 +208,7 @@ export function AIArticleGenerator({
                                         <div>
                                             <p className="text-sm font-medium text-yellow-900 dark:text-yellow-100">{progress}</p>
                                             <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
-                                                Please wait...
+                                                {t('common.pleaseWait')}
                                             </p>
                                         </div>
                                     </div>
@@ -223,7 +225,7 @@ export function AIArticleGenerator({
                             disabled={loading}
                             className="rounded-md border border-gray-300 dark:border-gray-600 px-6 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Cancel
+                            {t('common.cancel')}
                         </button>
                         <button
                             type="button"
@@ -237,14 +239,14 @@ export function AIArticleGenerator({
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
-                                    <span>Generating...</span>
+                                    <span>{t('aiGenerator.generating')}</span>
                                 </>
                             ) : (
                                 <>
                                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                                     </svg>
-                                    <span>{mode === 'create' ? 'Create with AI' : 'Update with AI'}</span>
+                                    <span>{mode === 'create' ? t('aiGenerator.createWithAI') : t('aiGenerator.updateWithAI')}</span>
                                 </>
                             )}
                         </button>

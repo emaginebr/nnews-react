@@ -1,5 +1,6 @@
 import type { Category } from '../types/news';
 import { Edit2, Trash2 } from 'lucide-react';
+import { useNNewsTranslation } from '../i18n';
 
 export interface CategoryListProps {
   categories: Category[];
@@ -20,12 +21,16 @@ export function CategoryList({
   onEditClick,
   onDeleteClick,
   showActions = false,
-  emptyMessage = 'No categories found',
+  emptyMessage,
 }: CategoryListProps) {
+  const { t } = useNNewsTranslation();
+
+  const displayEmpty = emptyMessage || t('categoryList.noCategories');
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-gray-500">Loading categories...</div>
+        <div className="text-gray-500">{t('categoryList.loadingCategories')}</div>
       </div>
     );
   }
@@ -34,7 +39,7 @@ export function CategoryList({
     return (
       <div className="rounded-md bg-red-50 p-4">
         <div className="text-sm text-red-800">
-          Error loading categories: {error.message}
+          {t('categoryList.errorLoading', { message: error.message })}
         </div>
       </div>
     );
@@ -43,7 +48,7 @@ export function CategoryList({
   if (categories.length === 0) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-gray-500">{emptyMessage}</div>
+        <div className="text-gray-500">{displayEmpty}</div>
       </div>
     );
   }
@@ -54,17 +59,17 @@ export function CategoryList({
         <thead className="bg-gray-50 dark:bg-gray-800">
           <tr>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[40%]">
-              Title
+              {t('common.title')}
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[20%]">
-              Articles
+              {t('categoryList.articles')}
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[25%]">
-              Parent
+              {t('categoryList.parent')}
             </th>
             {showActions && (
               <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[15%]">
-                Actions
+                {t('common.actions')}
               </th>
             )}
           </tr>
@@ -84,7 +89,7 @@ export function CategoryList({
                 {category.articleCount || 0}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                {category.parentId ? `Parent ID: ${category.parentId}` : '-'}
+                {category.parentId ? t('categoryList.parentId', { id: category.parentId }) : '-'}
               </td>
               {showActions && (
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
@@ -93,7 +98,7 @@ export function CategoryList({
                       <button
                         onClick={() => onEditClick(category)}
                         className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-                        title="Edit"
+                        title={t('common.edit')}
                       >
                         <Edit2 className="h-4 w-4" />
                       </button>
@@ -102,7 +107,7 @@ export function CategoryList({
                       <button
                         onClick={() => onDeleteClick(category)}
                         className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-                        title="Delete"
+                        title={t('common.delete')}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>

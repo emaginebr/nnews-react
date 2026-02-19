@@ -93,3 +93,8 @@ export {
 export type { PasswordStrength } from './utils/validators';
 
 export { cn } from './utils/cn';
+
+// i18n
+export { createI18nInstance, useNNewsTranslation, NAMESPACE, defaultTranslations } from './i18n';
+export { default as enTranslations } from './i18n/locales/en';
+export { default as ptTranslations } from './i18n/locales/pt';

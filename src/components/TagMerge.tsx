@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { Tag } from '../types/news';
+import { useNNewsTranslation } from '../i18n';
 
 export interface TagMergeProps {
   sourceTag: Tag;
@@ -18,6 +19,7 @@ export function TagMerge({
   onMerge,
   loading = false,
 }: TagMergeProps) {
+  const { t } = useNNewsTranslation();
   const [targetTagId, setTargetTagId] = useState<number | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -37,7 +39,7 @@ export function TagMerge({
     const newErrors: Record<string, string> = {};
 
     if (!targetTagId) {
-      newErrors.targetTag = 'Please select a target tag';
+      newErrors.targetTag = t('validation.targetTagRequired');
     }
 
     setErrors(newErrors);
@@ -64,21 +66,22 @@ export function TagMerge({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-        <h2 className="mb-4 text-2xl font-bold text-gray-900">Merge Tags</h2>
+        <h2 className="mb-4 text-2xl font-bold text-gray-900">{t('tagMerge.title')}</h2>
 
         <div className="mb-6 rounded-md bg-blue-50 p-4">
-          <p className="text-sm text-blue-800">
-            All articles tagged with{' '}
-            <strong className="font-semibold">#{sourceTag.title}</strong> will be
-            moved to the selected target tag, and the source tag will be deleted.
-          </p>
+          <p
+            className="text-sm text-blue-800"
+            dangerouslySetInnerHTML={{
+              __html: t('tagMerge.description', { tag: sourceTag.title }),
+            }}
+          />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Source Tag (Read-only) */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
-              Source Tag
+              {t('tagMerge.sourceTag')}
             </label>
             <div className="rounded-md border border-gray-300 bg-gray-50 px-4 py-2">
               <span className="font-medium text-gray-900">#{sourceTag.title}</span>
@@ -93,7 +96,7 @@ export function TagMerge({
           {/* Target Tag Selection */}
           <div className="space-y-2">
             <label htmlFor="targetTag" className="block text-sm font-medium text-gray-700">
-              Target Tag *
+              {t('tagMerge.targetTag')}
             </label>
             <select
               id="targetTag"
@@ -103,7 +106,7 @@ export function TagMerge({
                 errors.targetTag ? 'border-red-300' : 'border-gray-300'
               } px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
             >
-              <option value="">Select target tag</option>
+              <option value="">{t('tagMerge.selectTarget')}</option>
               {selectableTags.map((tag) => (
                 <option key={tag.tagId} value={tag.tagId}>
                   #{tag.title} {tag.slug ? `(${tag.slug})` : ''}
@@ -114,14 +117,14 @@ export function TagMerge({
               <p className="text-sm text-red-600">{errors.targetTag}</p>
             )}
             <p className="text-xs text-gray-500">
-              Select the tag that will receive all articles from the source tag
+              {t('tagMerge.targetHint')}
             </p>
           </div>
 
           {selectableTags.length === 0 && (
             <div className="rounded-md bg-yellow-50 p-4">
               <p className="text-sm text-yellow-800">
-                No other tags available. You need at least 2 tags to perform a merge.
+                {t('tagMerge.noTagsAvailable')}
               </p>
             </div>
           )}
@@ -134,14 +137,14 @@ export function TagMerge({
               disabled={loading}
               className="rounded-md border border-gray-300 px-6 py-2 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
               disabled={loading || selectableTags.length === 0}
               className="rounded-md bg-blue-600 px-6 py-2 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Merging...' : 'Merge Tags'}
+              {loading ? t('tagMerge.merging') : t('tagMerge.mergeTags')}
             </button>
           </div>
         </form>

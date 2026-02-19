@@ -3,6 +3,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import { ArticleStatus, type Article } from '../types/news';
 import 'highlight.js/styles/github.css';
+import { useNNewsTranslation } from '../i18n';
 
 export interface ArticleViewerProps {
   article: Article;
@@ -17,6 +18,8 @@ export function ArticleViewer({
   onEdit,
   showActions = false,
 }: ArticleViewerProps) {
+  const { t } = useNNewsTranslation();
+
   return (
     <div className="mx-auto max-w-4xl">
       {/* Header Actions */}
@@ -40,7 +43,7 @@ export function ArticleViewer({
                   d="M15 19l-7-7 7-7"
                 />
               </svg>
-              Back
+              {t('common.back')}
             </button>
           )}
 
@@ -62,7 +65,7 @@ export function ArticleViewer({
                   d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                 />
               </svg>
-              Edit
+              {t('common.edit')}
             </button>
           )}
         </div>

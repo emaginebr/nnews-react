@@ -1,4 +1,5 @@
 import { ArticleStatus, type Article, type PagedResult } from '../types/news';
+import { useNNewsTranslation } from '../i18n';
 
 export interface ArticleListProps {
   articles: PagedResult<Article> | null;
@@ -19,12 +20,16 @@ export function ArticleList({
   onEditClick,
   onAIClick,
   showActions = false,
-  emptyMessage = 'No articles found',
+  emptyMessage,
 }: ArticleListProps) {
+  const { t } = useNNewsTranslation();
+
+  const displayEmpty = emptyMessage || t('articleList.noArticles');
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-gray-500">Loading articles...</div>
+        <div className="text-gray-500">{t('articleList.loadingArticles')}</div>
       </div>
     );
   }
@@ -33,7 +38,7 @@ export function ArticleList({
     return (
       <div className="rounded-md bg-red-50 p-4">
         <div className="text-sm text-red-800">
-          Error loading articles: {error.message}
+          {t('articleList.errorLoading', { message: error.message })}
         </div>
       </div>
     );
@@ -42,7 +47,7 @@ export function ArticleList({
   if (!articles || articles.items.length === 0) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-gray-500">{emptyMessage}</div>
+        <div className="text-gray-500">{displayEmpty}</div>
       </div>
     );
   }
@@ -71,7 +76,7 @@ export function ArticleList({
                 />
               </div>
             )}
-            
+
             <div className="p-6 flex-1 flex flex-col">
               <div className="flex-1">
                 <h3
@@ -171,7 +176,7 @@ export function ArticleList({
                     <button
                       onClick={() => onAIClick(article)}
                       className="rounded p-2 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20"
-                      title="AI Edit"
+                      title={t('articleList.aiEdit')}
                     >
                       <svg
                         className="h-5 w-5"
@@ -192,7 +197,7 @@ export function ArticleList({
                     <button
                       onClick={() => onEditClick(article)}
                       className="rounded p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                      title="Edit"
+                      title={t('common.edit')}
                     >
                       <svg
                         className="h-5 w-5"
@@ -219,8 +224,12 @@ export function ArticleList({
       {articles.totalPages > 1 && (
         <div className="mt-6 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
           <div className="text-sm text-gray-700 dark:text-gray-300">
-            Showing {articles.items.length} of {articles.totalCount} articles
-            (Page {articles.page} of {articles.totalPages})
+            {t('articleList.showingArticles', {
+              count: articles.items.length,
+              total: articles.totalCount,
+              page: articles.page,
+              totalPages: articles.totalPages,
+            })}
           </div>
         </div>
       )}

@@ -1,5 +1,6 @@
 import type { Tag } from '../types/news';
 import { Edit2, Trash2, GitMerge } from 'lucide-react';
+import { useNNewsTranslation } from '../i18n';
 
 export interface TagListProps {
   tags: Tag[];
@@ -22,12 +23,16 @@ export function TagList({
   onDeleteClick,
   onMergeClick,
   showActions = false,
-  emptyMessage = 'No tags found',
+  emptyMessage,
 }: TagListProps) {
+  const { t } = useNNewsTranslation();
+
+  const displayEmpty = emptyMessage || t('tagList.noTags');
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-gray-500">Loading tags...</div>
+        <div className="text-gray-500">{t('tagList.loadingTags')}</div>
       </div>
     );
   }
@@ -36,7 +41,7 @@ export function TagList({
     return (
       <div className="rounded-md bg-red-50 p-4">
         <div className="text-sm text-red-800">
-          Error loading tags: {error.message}
+          {t('tagList.errorLoading', { message: error.message })}
         </div>
       </div>
     );
@@ -45,7 +50,7 @@ export function TagList({
   if (tags.length === 0) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-gray-500">{emptyMessage}</div>
+        <div className="text-gray-500">{displayEmpty}</div>
       </div>
     );
   }
@@ -78,7 +83,7 @@ export function TagList({
                 <button
                   onClick={() => onEditClick(tag)}
                   className="rounded p-1 text-blue-600 hover:bg-blue-50 transition-colors"
-                  title="Edit"
+                  title={t('common.edit')}
                 >
                   <Edit2 className="h-4 w-4" />
                 </button>
@@ -87,7 +92,7 @@ export function TagList({
                 <button
                   onClick={() => onMergeClick(tag)}
                   className="rounded p-1 text-purple-600 hover:bg-purple-50 transition-colors"
-                  title="Merge"
+                  title={t('tagList.merge')}
                 >
                   <GitMerge className="h-4 w-4" />
                 </button>
@@ -96,7 +101,7 @@ export function TagList({
                 <button
                   onClick={() => onDeleteClick(tag)}
                   className="rounded p-1 text-red-600 hover:bg-red-50 transition-colors"
-                  title="Delete"
+                  title={t('common.delete')}
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>

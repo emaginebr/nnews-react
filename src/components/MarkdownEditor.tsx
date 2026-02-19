@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github.css';
+import { useNNewsTranslation } from '../i18n';
 
 export interface MarkdownEditorProps {
   value: string;
@@ -16,12 +17,15 @@ export interface MarkdownEditorProps {
 export function MarkdownEditor({
   value,
   onChange,
-  placeholder = 'Write your content in Markdown...',
+  placeholder,
   label,
   error,
   minHeight = '400px',
 }: MarkdownEditorProps) {
+  const { t } = useNNewsTranslation();
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
+
+  const displayPlaceholder = placeholder || t('markdownEditor.placeholder');
 
   return (
     <div className="space-y-2">
@@ -43,7 +47,7 @@ export function MarkdownEditor({
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
             }`}
           >
-            Edit
+            {t('markdownEditor.editTab')}
           </button>
           <button
             type="button"
@@ -54,7 +58,7 @@ export function MarkdownEditor({
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
             }`}
           >
-            Preview
+            {t('markdownEditor.previewTab')}
           </button>
         </div>
 
@@ -64,7 +68,7 @@ export function MarkdownEditor({
             <textarea
               value={value}
               onChange={(e) => onChange(e.target.value)}
-              placeholder={placeholder}
+              placeholder={displayPlaceholder}
               className="h-full w-full resize-none border-0 p-4 font-mono text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-0"
               style={{ minHeight }}
             />
@@ -78,7 +82,7 @@ export function MarkdownEditor({
                   {value}
                 </ReactMarkdown>
               ) : (
-                <div className="text-gray-400 dark:text-gray-500">Nothing to preview</div>
+                <div className="text-gray-400 dark:text-gray-500">{t('markdownEditor.nothingToPreview')}</div>
               )}
             </div>
           )}
@@ -89,37 +93,37 @@ export function MarkdownEditor({
 
       {/* Markdown Help */}
       <div className="rounded-md bg-gray-50 dark:bg-gray-800 p-3 text-xs text-gray-600 dark:text-gray-400">
-        <p className="font-medium">Markdown Syntax Help:</p>
+        <p className="font-medium">{t('markdownEditor.syntaxHelp')}</p>
         <div className="mt-1 grid grid-cols-2 gap-2">
           <div>
-            <strong># Heading 1</strong> - Main heading
+            <strong># Heading 1</strong> - {t('markdownEditor.heading1')}
           </div>
           <div>
-            <strong>## Heading 2</strong> - Subheading
+            <strong>## Heading 2</strong> - {t('markdownEditor.heading2')}
           </div>
           <div>
-            <strong>**bold text**</strong> - Bold
+            <strong>**bold text**</strong> - {t('markdownEditor.bold')}
           </div>
           <div>
-            <strong>*italic text*</strong> - Italic
+            <strong>*italic text*</strong> - {t('markdownEditor.italic')}
           </div>
           <div>
-            <strong>[link](url)</strong> - Link
+            <strong>[link](url)</strong> - {t('markdownEditor.link')}
           </div>
           <div>
-            <strong>![alt](image.jpg)</strong> - Image
+            <strong>![alt](image.jpg)</strong> - {t('markdownEditor.image')}
           </div>
           <div>
-            <strong>- item</strong> - Bullet list
+            <strong>- item</strong> - {t('markdownEditor.bulletList')}
           </div>
           <div>
-            <strong>1. item</strong> - Numbered list
+            <strong>1. item</strong> - {t('markdownEditor.numberedList')}
           </div>
           <div>
-            <strong>`code`</strong> - Inline code
+            <strong>`code`</strong> - {t('markdownEditor.inlineCode')}
           </div>
           <div>
-            <strong>```language```</strong> - Code block
+            <strong>```language```</strong> - {t('markdownEditor.codeBlock')}
           </div>
         </div>
       </div>

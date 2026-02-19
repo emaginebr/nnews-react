@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { Tag, TagInput, TagUpdate } from '../types/news';
+import { useNNewsTranslation } from '../i18n';
 
 export interface TagModalProps {
   tag?: Tag | null;
@@ -16,6 +17,7 @@ export function TagModal({
   onSave,
   loading = false,
 }: TagModalProps) {
+  const { t } = useNNewsTranslation();
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -39,7 +41,7 @@ export function TagModal({
     const newErrors: Record<string, string> = {};
 
     if (!title.trim()) {
-      newErrors.title = 'Title is required';
+      newErrors.title = t('validation.titleRequired');
     }
 
     setErrors(newErrors);
@@ -76,14 +78,14 @@ export function TagModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
         <h2 className="mb-4 text-2xl font-bold text-gray-900">
-          {tag ? 'Edit Tag' : 'Create Tag'}
+          {tag ? t('tagModal.editTag') : t('tagModal.createTag')}
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Title */}
           <div className="space-y-2">
             <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-              Title *
+              {t('common.titleRequired')}
             </label>
             <input
               id="title"
@@ -93,7 +95,7 @@ export function TagModal({
               className={`w-full rounded-md border ${
                 errors.title ? 'border-red-300' : 'border-gray-300'
               } px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
-              placeholder="Enter tag title"
+              placeholder={t('tagModal.enterTitle')}
             />
             {errors.title && <p className="text-sm text-red-600">{errors.title}</p>}
           </div>
@@ -101,7 +103,7 @@ export function TagModal({
           {/* Slug */}
           <div className="space-y-2">
             <label htmlFor="slug" className="block text-sm font-medium text-gray-700">
-              Slug
+              {t('common.slug')}
             </label>
             <input
               id="slug"
@@ -109,10 +111,10 @@ export function TagModal({
               value={slug}
               onChange={(e) => setSlug(e.target.value)}
               className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              placeholder="tag-slug (optional)"
+              placeholder={t('tagModal.slugPlaceholder')}
             />
             <p className="text-xs text-gray-500">
-              URL-friendly version of the title. Leave empty to auto-generate.
+              {t('tagModal.slugHint')}
             </p>
           </div>
 
@@ -124,14 +126,14 @@ export function TagModal({
               disabled={loading}
               className="rounded-md border border-gray-300 px-6 py-2 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
               disabled={loading}
               className="rounded-md bg-blue-600 px-6 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
             >
-              {loading ? 'Saving...' : tag ? 'Update' : 'Create'}
+              {loading ? t('common.saving') : tag ? t('common.update') : t('common.create')}
             </button>
           </div>
         </form>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { Category, CategoryInput, CategoryUpdate } from '../types/news';
+import { useNNewsTranslation } from '../i18n';
 
 export interface CategoryModalProps {
   category?: Category | null;
@@ -18,6 +19,7 @@ export function CategoryModal({
   onSave,
   loading = false,
 }: CategoryModalProps) {
+  const { t } = useNNewsTranslation();
   const [title, setTitle] = useState('');
   const [parentId, setParentId] = useState<number | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -41,7 +43,7 @@ export function CategoryModal({
     const newErrors: Record<string, string> = {};
 
     if (!title.trim()) {
-      newErrors.title = 'Title is required';
+      newErrors.title = t('validation.titleRequired');
     }
 
     setErrors(newErrors);
@@ -81,13 +83,13 @@ export function CategoryModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
         <h2 className="mb-4 text-2xl font-bold text-gray-900">
-          {category ? 'Edit Category' : 'Create Category'}
+          {category ? t('categoryModal.editCategory') : t('categoryModal.createCategory')}
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-              Title *
+              {t('common.titleRequired')}
             </label>
             <input
               id="title"
@@ -97,7 +99,7 @@ export function CategoryModal({
               className={`w-full rounded-md border ${
                 errors.title ? 'border-red-300' : 'border-gray-300'
               } px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
-              placeholder="Enter category title"
+              placeholder={t('categoryModal.enterTitle')}
             />
             {errors.title && <p className="text-sm text-red-600">{errors.title}</p>}
           </div>
@@ -105,7 +107,7 @@ export function CategoryModal({
           {availableParents.length > 0 && (
             <div className="space-y-2">
               <label htmlFor="parent" className="block text-sm font-medium text-gray-700">
-                Parent Category
+                {t('categoryModal.parentCategory')}
               </label>
               <select
                 id="parent"
@@ -113,7 +115,7 @@ export function CategoryModal({
                 onChange={(e) => setParentId(e.target.value ? Number(e.target.value) : null)}
                 className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
-                <option value="">None (Top Level)</option>
+                <option value="">{t('categoryModal.noneTopLevel')}</option>
                 {availableParents.map((cat) => (
                   <option key={cat.categoryId} value={cat.categoryId}>
                     {cat.title}
@@ -130,14 +132,14 @@ export function CategoryModal({
               disabled={loading}
               className="rounded-md border border-gray-300 px-6 py-2 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
               disabled={loading}
               className="rounded-md bg-blue-600 px-6 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
             >
-              {loading ? 'Saving...' : category ? 'Update' : 'Create'}
+              {loading ? t('common.saving') : category ? t('common.update') : t('common.create')}
             </button>
           </div>
         </form>

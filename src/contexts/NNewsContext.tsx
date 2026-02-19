@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useMemo, useRef, useEffect } from 'react';
 import axios, { type AxiosInstance } from 'axios';
+import { I18nextProvider } from 'react-i18next';
+import { createI18nInstance } from '../i18n';
 import { ArticleAPI } from '../services/article-api';
 import { CategoryAPI } from '../services/category-api';
 import { TagAPI } from '../services/tag-api';
@@ -8,6 +10,8 @@ export interface NNewsConfig {
   apiUrl: string;
   apiClient?: AxiosInstance;
   headers?: Record<string, string>;
+  language?: string;
+  translations?: Record<string, Record<string, unknown>>;
 }
 
 export interface NNewsContextValue {
@@ -26,6 +30,22 @@ export interface NNewsProviderProps {
 }
 
 export function NNewsProvider({ config, children }: NNewsProviderProps) {
+  // Create i18n instance (memoized)
+  const i18nInstance = useMemo(
+    () => createI18nInstance(config.language, config.translations),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [config.language, config.translations]
+  );
+
+  // Handle language changes without recreating instance
+  const currentLang = useRef(config.language);
+  useEffect(() => {
+    if (config.language && config.language !== currentLang.current) {
+      i18nInstance.changeLanguage(config.language);
+      currentLang.current = config.language;
+    }
+  }, [config.language, i18nInstance]);
+
   // Keep a mutable ref so the interceptor always reads the latest config
   const configRef = useRef(config);
   useEffect(() => {
@@ -84,9 +104,11 @@ export function NNewsProvider({ config, children }: NNewsProviderProps) {
   }, [config.apiUrl, config.apiClient]);
 
   return (
-    <NNewsContext.Provider value={contextValue}>
-      {children}
-    </NNewsContext.Provider>
+    <I18nextProvider i18n={i18nInstance}>
+      <NNewsContext.Provider value={contextValue}>
+        {children}
+      </NNewsContext.Provider>
+    </I18nextProvider>
   );
 }
 

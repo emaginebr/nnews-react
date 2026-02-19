@@ -147,6 +147,7 @@ export function validatePasswordStrength(
     requireLowercase?: boolean;
     requireNumbers?: boolean;
     requireSpecialChars?: boolean;
+    t?: (key: string, opts?: Record<string, unknown>) => string;
   } = {}
 ): PasswordStrength {
   const {
@@ -155,14 +156,18 @@ export function validatePasswordStrength(
     requireLowercase = true,
     requireNumbers = true,
     requireSpecialChars = true,
+    t: tFn,
   } = options;
+
+  const msg = (key: string, fallback: string, interpolation?: Record<string, unknown>) =>
+    tFn ? tFn(key, interpolation) : fallback;
 
   const feedback: string[] = [];
   let score = 0;
 
   // Length check
   if (password.length < minLength) {
-    feedback.push(`Password must be at least ${minLength} characters long`);
+    feedback.push(msg('validation.passwordMinLength', `Password must be at least ${minLength} characters long`, { minLength }));
   } else {
     score++;
     if (password.length >= 12) score++;
@@ -170,28 +175,28 @@ export function validatePasswordStrength(
 
   // Uppercase check
   if (requireUppercase && !/[A-Z]/.test(password)) {
-    feedback.push('Password must contain at least one uppercase letter');
+    feedback.push(msg('validation.passwordUppercase', 'Password must contain at least one uppercase letter'));
   } else if (/[A-Z]/.test(password)) {
     score++;
   }
 
   // Lowercase check
   if (requireLowercase && !/[a-z]/.test(password)) {
-    feedback.push('Password must contain at least one lowercase letter');
+    feedback.push(msg('validation.passwordLowercase', 'Password must contain at least one lowercase letter'));
   } else if (/[a-z]/.test(password)) {
     score++;
   }
 
   // Numbers check
   if (requireNumbers && !/\d/.test(password)) {
-    feedback.push('Password must contain at least one number');
+    feedback.push(msg('validation.passwordNumber', 'Password must contain at least one number'));
   } else if (/\d/.test(password)) {
     score++;
   }
 
   // Special characters check
   if (requireSpecialChars && !/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-    feedback.push('Password must contain at least one special character');
+    feedback.push(msg('validation.passwordSpecialChar', 'Password must contain at least one special character'));
   } else if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
     score++;
   }
@@ -265,12 +270,17 @@ export function stringToTagsPreview(tagList: string): string[] {
 /**
  * Validate AI prompt
  */
-export function validatePrompt(prompt: string): { valid: boolean; error?: string } {
+export function validatePrompt(
+  prompt: string,
+  t?: (key: string, opts?: Record<string, unknown>) => string
+): { valid: boolean; error?: string } {
+  const msg = (key: string, fallback: string) => t ? t(key) : fallback;
+
   if (!prompt || prompt.trim().length < 10) {
-    return { valid: false, error: 'Prompt must be at least 10 characters long' };
+    return { valid: false, error: msg('validation.promptMinLength', 'Prompt must be at least 10 characters long') };
   }
   if (prompt.length > 2000) {
-    return { valid: false, error: 'Prompt must be less than 2000 characters' };
+    return { valid: false, error: msg('validation.promptMaxLength', 'Prompt must be less than 2000 characters') };
   }
   return { valid: true };
 }
@@ -278,27 +288,32 @@ export function validatePrompt(prompt: string): { valid: boolean; error?: string
 /**
  * Validate tag list string
  */
-export function validateTagList(tagList: string): { valid: boolean; error?: string; tags?: string[] } {
+export function validateTagList(
+  tagList: string,
+  t?: (key: string, opts?: Record<string, unknown>) => string
+): { valid: boolean; error?: string; tags?: string[] } {
+  const msg = (key: string, fallback: string) => t ? t(key) : fallback;
+
   if (!tagList || !tagList.trim()) {
     return { valid: true, tags: [] };
   }
 
   const tags = stringToTagsPreview(tagList);
-  
+
   if (tags.length === 0) {
-    return { valid: false, error: 'Invalid tag format. Use comma-separated values.' };
+    return { valid: false, error: msg('validation.tagFormatInvalid', 'Invalid tag format. Use comma-separated values.') };
   }
 
   // Check for empty tags
-  const hasEmptyTags = tagList.split(',').some(t => t.trim().length === 0 && t.length > 0);
+  const hasEmptyTags = tagList.split(',').some(tg => tg.trim().length === 0 && tg.length > 0);
   if (hasEmptyTags) {
-    return { valid: false, error: 'Tags cannot be empty. Remove extra commas.' };
+    return { valid: false, error: msg('validation.tagEmpty', 'Tags cannot be empty. Remove extra commas.') };
   }
 
   // Check individual tag length
-  const longTags = tags.filter(t => t.length > 50);
+  const longTags = tags.filter(tg => tg.length > 50);
   if (longTags.length > 0) {
-    return { valid: false, error: 'Individual tags must be less than 50 characters' };
+    return { valid: false, error: msg('validation.tagTooLong', 'Individual tags must be less than 50 characters') };
   }
 
   return { valid: true, tags };

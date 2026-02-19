@@ -3,6 +3,7 @@ import { RichTextEditor } from './RichTextEditor';
 import { ArticleStatus } from '../types/news';
 import type { Article, ArticleInput, ArticleUpdate, Category } from '../types/news';
 import { useNNews } from '../contexts/NNewsContext';
+import { useNNewsTranslation } from '../i18n';
 
 export interface RoleOption {
     roleId: number;
@@ -30,6 +31,7 @@ export function ArticleEditor({
     loading = false,
 }: ArticleEditorProps) {
     const { articleApi } = useNNews();
+    const { t } = useNNewsTranslation();
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [imageName, setImageName] = useState('');
@@ -114,11 +116,11 @@ export function ArticleEditor({
         const newErrors: Record<string, string> = {};
 
         if (!title.trim()) {
-            newErrors.title = 'Title is required';
+            newErrors.title = t('validation.titleRequired');
         }
 
         if (!content.trim()) {
-            newErrors.content = 'Content is required';
+            newErrors.content = t('validation.contentRequired');
         }
 
         setErrors(newErrors);
@@ -158,13 +160,13 @@ export function ArticleEditor({
 
         // Validate file type
         if (!file.type.startsWith('image/')) {
-            setErrors({ ...errors, image: 'Please select an image file' });
+            setErrors({ ...errors, image: t('validation.imageFileType') });
             return;
         }
 
         // Validate file size (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
-            setErrors({ ...errors, image: 'Image size must be less than 5MB' });
+            setErrors({ ...errors, image: t('validation.imageSizeLimit') });
             return;
         }
 
@@ -185,7 +187,7 @@ export function ArticleEditor({
             setErrors({ ...errors, image: '' });
         } catch (error) {
             console.error('Error uploading image:', error);
-            setErrors({ ...errors, image: 'Failed to upload image. Please try again.' });
+            setErrors({ ...errors, image: t('validation.imageUploadFailed') });
         } finally {
             setUploadingImage(false);
         }
@@ -205,7 +207,7 @@ export function ArticleEditor({
                     {/* Title */}
                     <div className="space-y-2">
                         <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Title *
+                            {t('common.titleRequired')}
                         </label>
                         <input
                             id="title"
@@ -214,7 +216,7 @@ export function ArticleEditor({
                             onChange={(e) => setTitle(e.target.value)}
                             className={`w-full rounded-md border ${errors.title ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
                                 } px-4 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
-                            placeholder="Enter article title"
+                            placeholder={t('articleEditor.enterTitle')}
                         />
                         {errors.title && <p className="text-sm text-red-600 dark:text-red-400">{errors.title}</p>}
                     </div>
@@ -222,7 +224,7 @@ export function ArticleEditor({
                     {/* Publication Date */}
                     <div className="space-y-2">
                         <label htmlFor="dateAt" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Publication Date
+                            {t('articleEditor.publicationDate')}
                         </label>
                         <input
                             id="dateAt"
@@ -236,7 +238,7 @@ export function ArticleEditor({
                     {/* Category */}
                     <div className="space-y-2">
                         <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Category
+                            {t('articleEditor.category')}
                         </label>
                         <select
                             id="category"
@@ -244,7 +246,7 @@ export function ArticleEditor({
                             onChange={(e) => setCategoryId(e.target.value ? Number(e.target.value) : null)}
                             className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-4 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                         >
-                            <option value="">No Category</option>
+                            <option value="">{t('common.noCategory')}</option>
                             {categories.map((cat) => (
                                 <option key={cat.categoryId} value={cat.categoryId}>
                                     {cat.title}
@@ -256,7 +258,7 @@ export function ArticleEditor({
                     {/* Status */}
                     <div className="space-y-2">
                         <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Status
+                            {t('articleEditor.status')}
                         </label>
                         <select
                             id="status"
@@ -264,11 +266,11 @@ export function ArticleEditor({
                             onChange={(e) => setStatus(Number(e.target.value) as ArticleStatus)}
                             className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-4 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                         >
-                            <option value={ArticleStatus.Draft}>Draft</option>
-                            <option value={ArticleStatus.Published}>Published</option>
-                            <option value={ArticleStatus.Archived}>Archived</option>
-                            <option value={ArticleStatus.Scheduled}>Scheduled</option>
-                            <option value={ArticleStatus.Review}>Review</option>
+                            <option value={ArticleStatus.Draft}>{t('articleEditor.statusDraft')}</option>
+                            <option value={ArticleStatus.Published}>{t('articleEditor.statusPublished')}</option>
+                            <option value={ArticleStatus.Archived}>{t('articleEditor.statusArchived')}</option>
+                            <option value={ArticleStatus.Scheduled}>{t('articleEditor.statusScheduled')}</option>
+                            <option value={ArticleStatus.Review}>{t('articleEditor.statusReview')}</option>
                         </select>
                     </div>
                 </div>
@@ -278,7 +280,7 @@ export function ArticleEditor({
                     {/* Featured Image */}
                     <div className="space-y-2">
                         <label htmlFor="image" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Featured Image
+                            {t('articleEditor.featuredImage')}
                         </label>
                         
                         {imagePreview ? (
@@ -302,7 +304,7 @@ export function ArticleEditor({
                                 </button>
                                 {uploadingImage && (
                                     <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-md">
-                                        <span className="text-white text-sm">Uploading...</span>
+                                        <span className="text-white text-sm">{t('articleEditor.uploading')}</span>
                                     </div>
                                 )}
                             </div>
@@ -321,7 +323,7 @@ export function ArticleEditor({
                         
                         {errors.image && <p className="text-sm text-red-600 dark:text-red-400">{errors.image}</p>}
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                            JPG, PNG, GIF. Max 5MB
+                            {t('articleEditor.imageHint')}
                         </p>
                     </div>
                 </div>
@@ -330,12 +332,12 @@ export function ArticleEditor({
             {/* Content - Full Width */}
             <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Content *
+                    {t('articleEditor.contentLabel')}
                 </label>
                 <RichTextEditor
                     value={content}
                     onChange={setContent}
-                    placeholder="Write your article content..."
+                    placeholder={t('articleEditor.contentPlaceholder')}
                     error={errors.content}
                 />
                 {errors.content && <p className="text-sm text-red-600 dark:text-red-400">{errors.content}</p>}
@@ -344,7 +346,7 @@ export function ArticleEditor({
             {/* Tags */}
             <div className="space-y-2">
                 <label htmlFor="tags" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Tags
+                    {t('articleEditor.tags')}
                 </label>
                 <input
                     id="tags"
@@ -352,17 +354,17 @@ export function ArticleEditor({
                     value={tagList}
                     onChange={(e) => setTagList(e.target.value)}
                     className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-4 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    placeholder="Enter tags separated by commas (e.g., AI, Technology, Innovation)"
+                    placeholder={t('articleEditor.tagsPlaceholder')}
                 />
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Comma-separated list of tags. Tags will be created automatically if they don't exist.
+                    {t('articleEditor.tagsHint')}
                 </p>
             </div>
 
             {/* Visibilidade / Roles */}
             <div className="space-y-3">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Visibilidade
+                    {t('articleEditor.visibility')}
                 </label>
 
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -373,7 +375,7 @@ export function ArticleEditor({
                         className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
                     />
                     <span className="text-sm text-gray-700 dark:text-gray-300">
-                        Vis&#237;vel para todos
+                        {t('articleEditor.visibleToAll')}
                     </span>
                 </label>
 
@@ -381,12 +383,12 @@ export function ArticleEditor({
                     <div className="ml-6 space-y-2">
                         {rolesLoading ? (
                             <p className="text-sm text-gray-500 dark:text-gray-400">
-                                Carregando perfis...
+                                {t('articleEditor.loadingRoles')}
                             </p>
                         ) : displayRoles.length > 0 ? (
                             <div className="space-y-2">
                                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                                    Selecione os perfis que podem visualizar este artigo:
+                                    {t('articleEditor.selectRolesHint')}
                                 </p>
                                 {displayRoles.map((role) => (
                                     <label
@@ -407,7 +409,7 @@ export function ArticleEditor({
                             </div>
                         ) : (
                             <p className="text-sm text-gray-500 dark:text-gray-400">
-                                Nenhum perfil dispon&#237;vel.
+                                {t('articleEditor.noRolesAvailable')}
                             </p>
                         )}
                     </div>
@@ -422,14 +424,14 @@ export function ArticleEditor({
                     disabled={loading}
                     className="rounded-md border border-gray-300 dark:border-gray-600 px-6 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
                 >
-                    Cancel
+                    {t('common.cancel')}
                 </button>
                 <button
                     type="submit"
                     disabled={loading}
                     className="rounded-md bg-blue-600 px-6 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
                 >
-                    {loading ? 'Saving...' : article ? 'Update Article' : 'Create Article'}
+                    {loading ? t('common.saving') : article ? t('articleEditor.updateArticle') : t('articleEditor.createArticle')}
                 </button>
             </div>
         </form>
