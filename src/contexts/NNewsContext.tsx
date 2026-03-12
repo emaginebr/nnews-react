@@ -8,6 +8,7 @@ import { TagAPI } from '../services/tag-api';
 
 export interface NNewsConfig {
   apiUrl: string;
+  tenantId?: string;
   apiClient?: AxiosInstance;
   headers?: Record<string, string>;
   language?: string;
@@ -66,15 +67,20 @@ export function NNewsProvider({ config, children }: NNewsProviderProps) {
         },
       });
 
-    // Interceptor to inject dynamic headers (e.g. Authorization token) on every request
+    // Interceptor to inject dynamic headers (e.g. Authorization token, Tenant ID) on every request
     apiClient.interceptors.request.use((requestConfig) => {
-      const currentHeaders = configRef.current.headers;
-      if (currentHeaders) {
-        Object.entries(currentHeaders).forEach(([key, value]) => {
+      const currentConfig = configRef.current;
+
+      if (currentConfig.headers) {
+        Object.entries(currentConfig.headers).forEach(([key, value]) => {
           if (value) {
             requestConfig.headers.set(key, value);
           }
         });
+      }
+
+      if (currentConfig.tenantId) {
+        requestConfig.headers.set('X-Tenant-Id', currentConfig.tenantId);
       }
 
       console.log('[NNews] Request interceptor:', {
@@ -83,6 +89,7 @@ export function NNewsProvider({ config, children }: NNewsProviderProps) {
         headers: {
           Authorization: requestConfig.headers?.Authorization || '(not set)',
           'Content-Type': requestConfig.headers?.['Content-Type'] || '(not set)',
+          'X-Tenant-Id': requestConfig.headers?.['X-Tenant-Id'] || '(not set)',
         },
       });
 
@@ -101,7 +108,7 @@ export function NNewsProvider({ config, children }: NNewsProviderProps) {
       tagApi,
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [config.apiUrl, config.apiClient]);
+  }, [config.apiUrl, config.apiClient, config.tenantId]);
 
   return (
     <I18nextProvider i18n={i18nInstance}>

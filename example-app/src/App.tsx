@@ -19,14 +19,17 @@ import { ROUTES } from './lib/constants';
 function AppContent() {
   const { token } = useNAuth();
 
+  const tenantId = import.meta.env.VITE_TENANT_ID;
+
   const nNewsConfig = useMemo(() => ({
     apiUrl: import.meta.env.VITE_NNEWS_API_URL,
+    ...(tenantId && { tenantId }),
     ...(token && {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     }),
-  }), [token]);
+  }), [token, tenantId]);
 
   return (
     <NNewsProvider config={nNewsConfig}>
