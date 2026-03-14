@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { RichTextEditor } from './RichTextEditor';
-import { ArticleStatus } from '../types/news';
+import { MarkdownEditor } from './MarkdownEditor';
+import { ArticleStatus, ContentType } from '../types/news';
 import type { Article, ArticleInput, ArticleUpdate, Category } from '../types/news';
 import { useNNews } from '../contexts/NNewsContext';
 import { useNNewsTranslation } from '../i18n';
@@ -38,6 +39,7 @@ export function ArticleEditor({
     const [imagePreview, setImagePreview] = useState<string>('');
     const [uploadingImage, setUploadingImage] = useState(false);
     const [status, setStatus] = useState<ArticleStatus>(ArticleStatus.Draft);
+    const [contentType, setContentType] = useState<ContentType>(ContentType.Html);
     const [categoryId, setCategoryId] = useState<number | null>(null);
     const [dateAt, setDateAt] = useState<string>('');
     const [tagList, setTagList] = useState<string>('');
@@ -57,6 +59,7 @@ export function ArticleEditor({
                 setImagePreview(article.imageName);
             }
             setStatus(article.status);
+            setContentType(article.contentType || ContentType.Html);
             setCategoryId(article.categoryId || null);
             setDateAt(article.dateAt ? new Date(article.dateAt).toISOString().slice(0, 16) : '');
             setTagList(article.tags?.map((t) => t.title).join(', ') || '');
@@ -141,6 +144,7 @@ export function ArticleEditor({
             content: content.trim(),
             imageName: imageName || undefined,
             status,
+            contentType,
             categoryId: categoryId || undefined,
             dateAt: dateAt || undefined,
             tagList: tagList.trim() || undefined,
@@ -273,6 +277,23 @@ export function ArticleEditor({
                             <option value={ArticleStatus.Review}>{t('articleEditor.statusReview')}</option>
                         </select>
                     </div>
+
+                    {/* Content Type */}
+                    <div className="space-y-2">
+                        <label htmlFor="contentType" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {t('articleEditor.contentType')}
+                        </label>
+                        <select
+                            id="contentType"
+                            value={contentType}
+                            onChange={(e) => setContentType(Number(e.target.value) as ContentType)}
+                            className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-4 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        >
+                            <option value={ContentType.PlainText}>{t('articleEditor.contentTypePlainText')}</option>
+                            <option value={ContentType.Html}>{t('articleEditor.contentTypeHtml')}</option>
+                            <option value={ContentType.MarkDown}>{t('articleEditor.contentTypeMarkDown')}</option>
+                        </select>
+                    </div>
                 </div>
 
                 {/* Right Column - 1/3 */}
@@ -334,12 +355,29 @@ export function ArticleEditor({
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     {t('articleEditor.contentLabel')}
                 </label>
-                <RichTextEditor
-                    value={content}
-                    onChange={setContent}
-                    placeholder={t('articleEditor.contentPlaceholder')}
-                    error={errors.content}
-                />
+                {contentType === ContentType.Html ? (
+                    <RichTextEditor
+                        value={content}
+                        onChange={setContent}
+                        placeholder={t('articleEditor.contentPlaceholder')}
+                        error={errors.content}
+                    />
+                ) : contentType === ContentType.MarkDown ? (
+                    <MarkdownEditor
+                        value={content}
+                        onChange={setContent}
+                        placeholder={t('articleEditor.contentPlaceholder')}
+                    />
+                ) : (
+                    <textarea
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        placeholder={t('articleEditor.contentPlaceholder')}
+                        rows={15}
+                        className={`w-full rounded-md border ${errors.content ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
+                            } px-4 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono`}
+                    />
+                )}
                 {errors.content && <p className="text-sm text-red-600 dark:text-red-400">{errors.content}</p>}
             </div>
 

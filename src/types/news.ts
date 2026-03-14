@@ -10,6 +10,12 @@ export enum ArticleStatus {
   Review = 4,
 }
 
+export enum ContentType {
+  PlainText = 1,
+  Html = 2,
+  MarkDown = 3,
+}
+
 // ============================================================================
 // Core Interfaces
 // ============================================================================
@@ -44,6 +50,7 @@ export interface Article {
   imageName?: string;
   imageUrl?: string;
   status: ArticleStatus;
+  contentType?: ContentType;
   dateAt?: string | Date;
   createdAt?: string | Date;
   updatedAt?: string | Date;
@@ -80,6 +87,7 @@ export interface ArticleInput {
   content: string;
   imageName?: string;
   status: ArticleStatus;
+  contentType?: ContentType;
   categoryId?: number;
   dateAt?: string | Date;
   tagList?: string;

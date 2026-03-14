@@ -70,7 +70,7 @@ export type {
 export type { TagMergeProps } from './components/TagMerge';
 export type { AIArticleGeneratorProps } from './components/AIArticleGenerator';
 
-export { ArticleStatus } from './types/news';
+export { ArticleStatus, ContentType } from './types/news';
 
 // Utility Functions
 export {

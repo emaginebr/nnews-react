@@ -1,7 +1,7 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
-import { ArticleStatus, type Article } from '../types/news';
+import { ArticleStatus, ContentType, type Article } from '../types/news';
 import 'highlight.js/styles/github.css';
 import { useNNewsTranslation } from '../i18n';
 
@@ -155,12 +155,18 @@ export function ArticleViewer({
 
         {/* Article Content */}
         <div className="prose prose-lg mt-8 max-w-none">
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeHighlight]}
-          >
-            {article.content}
-          </ReactMarkdown>
+          {article.contentType === ContentType.PlainText ? (
+            <pre className="whitespace-pre-wrap font-sans">{article.content}</pre>
+          ) : article.contentType === ContentType.Html ? (
+            <div dangerouslySetInnerHTML={{ __html: article.content }} />
+          ) : (
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeHighlight]}
+            >
+              {article.content}
+            </ReactMarkdown>
+          )}
         </div>
       </article>
     </div>
