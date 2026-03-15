@@ -14,12 +14,12 @@ on:
         required: true
 
 jobs:
-  # ─── Job 1: Extract version from git tag or manual input ───
-  extract-version:
+  # ─── Job 1: Extract version and update package.json ───
+  prepare:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     permissions:
-      contents: read
+      contents: write
     outputs:
       version: ${{ steps.version.outputs.version }}
 
@@ -29,6 +29,7 @@ jobs:
       with:
         fetch-depth: 0
         fetch-tags: true
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Extract version
       id: version
@@ -41,63 +42,32 @@ jobs:
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "Resolved version: $VERSION"
 
-  # ─── Job 2: Update package.json version and commit ───
-  update-version:
-    runs-on: ubuntu-latest
-    needs: extract-version
-    permissions:
-      contents: write
-    outputs:
-      sha: ${{ steps.push.outputs.sha }}
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        token: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-
-    - name: Check if version changed
-      id: check
+    - name: Update package.json version
       run: |
         CURRENT=$(node -p "require('./package.json').version")
-        TARGET="${{ needs.extract-version.outputs.version }}"
-        if [ "$CURRENT" = "$TARGET" ]; then
-          echo "changed=false" >> $GITHUB_OUTPUT
-        else
-          echo "changed=true" >> $GITHUB_OUTPUT
-        fi
+        TARGET="${{ steps.version.outputs.version }}"
         echo "Current: $CURRENT -> Target: $TARGET"
+        if [ "$CURRENT" != "$TARGET" ]; then
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+            pkg.version = '$TARGET';
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          "
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json
+          git commit -m "chore: bump version to $TARGET"
+          git push origin HEAD:main
+          echo "Version updated and pushed."
+        else
+          echo "Version already up to date."
+        fi
 
-    - name: Update package.json version
-      if: steps.check.outputs.changed == 'true'
-      run: npm version ${{ needs.extract-version.outputs.version }} --no-git-tag-version
-
-    - name: Commit and push version update
-      id: push
-      if: steps.check.outputs.changed == 'true'
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git add package.json package-lock.json
-        git commit -m "chore: bump version to ${{ needs.extract-version.outputs.version }}"
-        git push origin HEAD:main
-        echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-
-    - name: No change needed
-      if: steps.check.outputs.changed != 'true'
-      id: no-change
-      run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-
-  # ─── Job 3: Lint (parallel) ───
+  # ─── Job 2: Lint (parallel) ───
   lint:
     runs-on: ubuntu-latest
-    needs: update-version
+    needs: prepare
 
     steps:
     - name: Checkout code
@@ -116,10 +86,10 @@ jobs:
     - name: Lint
       run: npm run lint
 
-  # ─── Job 4: Type check (parallel) ───
+  # ─── Job 3: Type check (parallel) ───
   type-check:
     runs-on: ubuntu-latest
-    needs: update-version
+    needs: prepare
 
     steps:
     - name: Checkout code
@@ -138,10 +108,10 @@ jobs:
     - name: Type check
       run: npm run type-check
 
-  # ─── Job 5: Test (parallel) ───
+  # ─── Job 4: Test (parallel) ───
   test:
     runs-on: ubuntu-latest
-    needs: update-version
+    needs: prepare
 
     steps:
     - name: Checkout code
@@ -160,7 +130,7 @@ jobs:
     - name: Run tests
       run: npm test
 
-  # ─── Job 6: Build (after all checks pass) ───
+  # ─── Job 5: Build (after all checks pass) ───
   build:
     runs-on: ubuntu-latest
     needs: [lint, type-check, test]
@@ -175,7 +145,6 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        registry-url: 'https://registry.npmjs.org'
 
     - name: Install dependencies
       run: npm ci
@@ -190,10 +159,10 @@ jobs:
         path: dist/
         retention-days: 1
 
-  # ─── Job 7: Publish to NPM ───
+  # ─── Job 6: Publish to NPM ───
   publish:
     runs-on: ubuntu-latest
-    needs: [extract-version, build]
+    needs: [prepare, build]
     permissions:
       contents: read
 
@@ -215,18 +184,15 @@ jobs:
         name: dist
         path: dist/
 
-    - name: Set package version
-      run: npm version ${{ needs.extract-version.outputs.version }} --no-git-tag-version
-
     - name: Publish to NPM
       run: npm publish --access public
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  # ─── Job 8: Summary ───
+  # ─── Job 7: Summary ───
   summary:
     runs-on: ubuntu-latest
-    needs: [extract-version, publish]
+    needs: [prepare, publish]
     if: always()
 
     steps:
@@ -236,7 +202,7 @@ jobs:
         echo "## 📦 Published to NPM" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "- Package: \`nnews-react\`" >> $GITHUB_STEP_SUMMARY
-        echo "- Version: \`${{ needs.extract-version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "- Version: \`${{ needs.prepare.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
         echo "- Registry: https://www.npmjs.com/package/nnews-react" >> $GITHUB_STEP_SUMMARY
 
     - name: Failure summary
@@ -244,5 +210,5 @@ jobs:
       run: |
         echo "## ❌ Publish Failed" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "- Version: \`${{ needs.extract-version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "- Version: \`${{ needs.prepare.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
         echo "- Check the job logs for details." >> $GITHUB_STEP_SUMMARY
