@@ -54,7 +54,6 @@ export function ArticleEditor({
             setTitle(article.title);
             setContent(article.content);
             setImageName(article.imageName || '');
-            console.log('imageName:', article.imageName);
             if (article.imageName) {
                 setImagePreview(article.imageName);
             }
