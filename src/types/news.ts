@@ -48,6 +48,7 @@ export interface Article {
   title: string;
   content: string;
   imageName?: string;
+  imageUrl?: string;
   status: ArticleStatus;
   contentType?: ContentType;
   dateAt?: string | Date;

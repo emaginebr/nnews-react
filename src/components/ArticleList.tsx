@@ -69,9 +69,9 @@ export function ArticleList({
               }`}
               onClick={() => onArticleClick?.(article)}
             >
-              {article.imageName ? (
+              {(article.imageUrl || article.imageName) ? (
                 <img
-                  src={article.imageName}
+                  src={article.imageUrl || article.imageName}
                   alt={article.title}
                   className="w-full h-[250px] object-cover hover:scale-105 transition-transform duration-300"
                 />

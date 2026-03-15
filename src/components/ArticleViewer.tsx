@@ -21,7 +21,7 @@ export function ArticleViewer({
   const { t } = useNNewsTranslation();
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <>
       {/* Header Actions */}
       {(onBack || (showActions && onEdit)) && (
         <div className="mb-6 flex items-center justify-between">
@@ -72,7 +72,7 @@ export function ArticleViewer({
       )}
 
       {/* Article Header */}
-      <article className="rounded-xl bg-white dark:bg-gray-800 p-8 shadow-md border border-gray-200 dark:border-gray-700">
+      <article>
         <header className="border-b border-gray-200 dark:border-gray-700 pb-6">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100">{article.title}</h1>
 
@@ -169,6 +169,6 @@ export function ArticleViewer({
           )}
         </div>
       </article>
-    </div>
+    </>
   );
 }
