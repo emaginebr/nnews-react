@@ -39,6 +39,7 @@ export function ArticleListPage() {
 
   useEffect(() => {
     fetchCategories();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -48,6 +49,7 @@ export function ArticleListPage() {
       categoryId: filterCategoryId,
       status: filterStatus,
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, filterCategoryId, filterStatus]);
 
   const handleCategoryChange = (value: string) => {

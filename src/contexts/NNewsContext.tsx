@@ -67,7 +67,6 @@ export function NNewsProvider({ config, children }: NNewsProviderProps) {
   // Create i18n instance (memoized)
   const i18nInstance = useMemo(
     () => createI18nInstance(config.language, config.translations),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [config.language, config.translations]
   );
 
@@ -162,6 +161,7 @@ export function NNewsProvider({ config, children }: NNewsProviderProps) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useNNews(): NNewsContextValue {
   const context = useContext(NNewsContext);
 

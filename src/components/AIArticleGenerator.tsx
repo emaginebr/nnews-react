@@ -90,9 +90,9 @@ export function AIArticleGenerator({
             setPrompt('');
             setGenerateImage(false);
             onClose();
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Error generating article with AI:', err);
-            setError(err.message || t('aiGenerator.generationFailed'));
+            setError(err instanceof Error ? err.message : t('aiGenerator.generationFailed'));
             setProgress('');
         } finally {
             setLoading(false);

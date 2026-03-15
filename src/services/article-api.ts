@@ -48,7 +48,7 @@ export class ArticleAPI {
     page: number = 1,
     pageSize: number = 10
   ): Promise<PagedResult<Article>> {
-    const params: Record<string, any> = { page, pageSize };
+    const params: Record<string, string | number> = { page, pageSize };
     if (categoryId) {
       params.categoryId = categoryId;
     }

@@ -32,7 +32,7 @@ export function ArticleEditPage() {
     }));
   };
 
-  const [currentArticle, setCurrentArticle] = useState<any>(null);
+  const [currentArticle, setCurrentArticle] = useState<Article | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -41,7 +41,8 @@ export function ArticleEditPage() {
     if (isEditing) {
       fetchArticles({ page: 1, pageSize: 100 });
     }
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditing]);
 
   useEffect(() => {
     if (isEditing && articles) {

@@ -24,7 +24,7 @@ export class CategoryAPI {
    * List categories by parent, optionally filtered by roles
    */
   async listByParent(roles?: string[], parentId?: number): Promise<Category[]> {
-    const params: Record<string, any> = {};
+    const params: Record<string, string | number> = {};
 
     if (roles && roles.length > 0) {
       params.roles = roles.join(',');
