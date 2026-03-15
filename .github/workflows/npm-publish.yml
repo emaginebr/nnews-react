@@ -48,7 +48,7 @@ jobs:
     permissions:
       contents: write
     outputs:
-      version: ${{ needs.extract-version.outputs.version }}
+      sha: ${{ steps.push.outputs.sha }}
 
     steps:
     - name: Checkout code
@@ -67,20 +67,19 @@ jobs:
       run: |
         CURRENT=$(node -p "require('./package.json').version")
         TARGET="${{ needs.extract-version.outputs.version }}"
-        echo "current=$CURRENT" >> $GITHUB_OUTPUT
-        echo "target=$TARGET" >> $GITHUB_OUTPUT
         if [ "$CURRENT" = "$TARGET" ]; then
           echo "changed=false" >> $GITHUB_OUTPUT
         else
           echo "changed=true" >> $GITHUB_OUTPUT
         fi
-        echo "Current: $CURRENT → Target: $TARGET"
+        echo "Current: $CURRENT -> Target: $TARGET"
 
     - name: Update package.json version
       if: steps.check.outputs.changed == 'true'
       run: npm version ${{ needs.extract-version.outputs.version }} --no-git-tag-version
 
-    - name: Commit version update
+    - name: Commit and push version update
+      id: push
       if: steps.check.outputs.changed == 'true'
       run: |
         git config user.name "github-actions[bot]"
@@ -88,9 +87,15 @@ jobs:
         git add package.json package-lock.json
         git commit -m "chore: bump version to ${{ needs.extract-version.outputs.version }}"
         git push origin HEAD:main
+        echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
-  # ─── Job 3: Install dependencies ───
-  install:
+    - name: No change needed
+      if: steps.check.outputs.changed != 'true'
+      id: no-change
+      run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+  # ─── Job 3: Lint (parallel) ───
+  lint:
     runs-on: ubuntu-latest
     needs: update-version
 
@@ -104,46 +109,17 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        registry-url: 'https://registry.npmjs.org'
 
     - name: Install dependencies
       run: npm ci
 
-    - name: Cache node_modules
-      uses: actions/cache/save@v4
-      with:
-        path: node_modules
-        key: npm-${{ github.sha }}-${{ hashFiles('package-lock.json') }}
-
-  # ─── Job 4: Lint ───
-  lint:
-    runs-on: ubuntu-latest
-    needs: install
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        ref: main
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-
-    - name: Restore node_modules
-      uses: actions/cache/restore@v4
-      with:
-        path: node_modules
-        key: npm-${{ github.sha }}-${{ hashFiles('package-lock.json') }}
-
     - name: Lint
       run: npm run lint
 
-  # ─── Job 5: Type check ───
+  # ─── Job 4: Type check (parallel) ───
   type-check:
     runs-on: ubuntu-latest
-    needs: install
+    needs: update-version
 
     steps:
     - name: Checkout code
@@ -156,19 +132,16 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Restore node_modules
-      uses: actions/cache/restore@v4
-      with:
-        path: node_modules
-        key: npm-${{ github.sha }}-${{ hashFiles('package-lock.json') }}
+    - name: Install dependencies
+      run: npm ci
 
     - name: Type check
       run: npm run type-check
 
-  # ─── Job 6: Test ───
+  # ─── Job 5: Test (parallel) ───
   test:
     runs-on: ubuntu-latest
-    needs: install
+    needs: update-version
 
     steps:
     - name: Checkout code
@@ -181,16 +154,13 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Restore node_modules
-      uses: actions/cache/restore@v4
-      with:
-        path: node_modules
-        key: npm-${{ github.sha }}-${{ hashFiles('package-lock.json') }}
+    - name: Install dependencies
+      run: npm ci
 
     - name: Run tests
       run: npm test
 
-  # ─── Job 7: Build ───
+  # ─── Job 6: Build (after all checks pass) ───
   build:
     runs-on: ubuntu-latest
     needs: [lint, type-check, test]
@@ -207,11 +177,8 @@ jobs:
         node-version: '20'
         registry-url: 'https://registry.npmjs.org'
 
-    - name: Restore node_modules
-      uses: actions/cache/restore@v4
-      with:
-        path: node_modules
-        key: npm-${{ github.sha }}-${{ hashFiles('package-lock.json') }}
+    - name: Install dependencies
+      run: npm ci
 
     - name: Build
       run: npm run build
@@ -223,7 +190,7 @@ jobs:
         path: dist/
         retention-days: 1
 
-  # ─── Job 8: Publish to NPM ───
+  # ─── Job 7: Publish to NPM ───
   publish:
     runs-on: ubuntu-latest
     needs: [extract-version, build]
@@ -256,7 +223,7 @@ jobs:
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  # ─── Job 9: Summary ───
+  # ─── Job 8: Summary ───
   summary:
     runs-on: ubuntu-latest
     needs: [extract-version, publish]
