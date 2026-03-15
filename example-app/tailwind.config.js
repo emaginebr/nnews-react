@@ -4,6 +4,7 @@ export default {
   content: [
     './src/**/*.{ts,tsx}',
     './node_modules/nauth-react/dist/**/*.{js,mjs}',
+    './node_modules/nnews-react/dist/**/*.{js,mjs}',
   ],
   theme: {
     container: {
@@ -14,17 +15,16 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Outfit', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
-        brand: {
-          primary: '#7C3AED',
-          secondary: '#DB2777',
-          accent: '#5cdef5ff',
-        },
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',

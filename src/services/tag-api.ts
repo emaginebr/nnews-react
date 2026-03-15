@@ -2,8 +2,9 @@ import type { AxiosInstance } from 'axios';
 import type { Tag, TagInput, TagUpdate } from '../types/news';
 
 const NEWS_API_ENDPOINTS = {
-  TAGS: '/tag',
-  TAG_BY_ID: (id: number) => `/tag/${id}`,
+  TAGS: '/Tag',
+  LIST_BY_ROLES: '/Tag/ListByRoles',
+  TAG_BY_ID: (id: number) => `/Tag/${id}`,
   TAG_MERGE: (sourceId: number, targetId: number) => `/Tag/merge/${sourceId}/${targetId}`,
 };
 
@@ -17,6 +18,16 @@ export class TagAPI {
     console.log('[TagAPI] listTags - Request:', { url: NEWS_API_ENDPOINTS.TAGS });
     const response = await this.client.get<Tag[]>(NEWS_API_ENDPOINTS.TAGS);
     console.log('[TagAPI] listTags - Response:', response.data);
+    return response.data;
+  }
+
+  /**
+   * List tags filtered by user roles
+   */
+  async listByRoles(): Promise<Tag[]> {
+    console.log('[TagAPI] listByRoles - Request:', { url: NEWS_API_ENDPOINTS.LIST_BY_ROLES });
+    const response = await this.client.get<Tag[]>(NEWS_API_ENDPOINTS.LIST_BY_ROLES);
+    console.log('[TagAPI] listByRoles - Response:', response.data);
     return response.data;
   }
 

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { TagList, TagModal, TagMerge, useTags } from 'nnews-react';
+import { TagList, TagModal, TagMerge, ConfirmModal, useTags } from 'nnews-react';
 import type { Tag, TagInput, TagUpdate } from 'nnews-react';
-import { X, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent } from '../components/ui/Card';
 
@@ -13,9 +12,10 @@ export default function TagsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [tagToDelete, setTagToDelete] = useState<Tag | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [mergeModalOpen, setMergeModalOpen] = useState(false);
   const [tagToMerge, setTagToMerge] = useState<Tag | null>(null);
-  
+
   const {
     tags,
     loading,
@@ -27,7 +27,6 @@ export default function TagsPage() {
     mergeTags,
   } = useTags();
 
-  // Fetch tags on mount
   useEffect(() => {
     fetchTags();
   }, []);
@@ -68,7 +67,7 @@ export default function TagsPage() {
 
   const confirmDelete = async () => {
     if (!tagToDelete) return;
-
+    setDeleteLoading(true);
     try {
       await deleteTag(tagToDelete.tagId || 0);
       toast.success('Tag deleted successfully!');
@@ -76,14 +75,10 @@ export default function TagsPage() {
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to delete tag');
     } finally {
+      setDeleteLoading(false);
       setDeleteConfirmOpen(false);
       setTagToDelete(null);
     }
-  };
-
-  const cancelDelete = () => {
-    setDeleteConfirmOpen(false);
-    setTagToDelete(null);
   };
 
   const handleCloseModal = () => {
@@ -111,29 +106,21 @@ export default function TagsPage() {
     }
   };
 
-  const cancelMerge = () => {
-    setMergeModalOpen(false);
-    setTagToMerge(null);
-  };
-
   return (
-    <div className="container mx-auto px-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-          Manage Tags
-        </h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
+    <div className="max-w-7xl mx-auto animate-fade-in">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-foreground">Manage Tags</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Create and manage tags for organizing articles
         </p>
       </div>
 
       <Card className="pt-5">
         <CardContent className="space-y-4">
-          {/* Create Button */}
           <div className="flex justify-end">
             <button
               onClick={handleCreate}
-              className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors"
+              className="rounded-xl bg-secondary border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors"
             >
               New Tag
             </button>
@@ -152,136 +139,46 @@ export default function TagsPage() {
         </CardContent>
       </Card>
 
-      {/* Modal */}
-      {modalOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-          onClick={handleCloseModal}
-        >
-          <div
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between rounded-t-lg">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                {modalMode === 'create' ? 'Create New Tag' : 'Edit Tag'}
-              </h2>
-              <button
-                onClick={handleCloseModal}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Modal Content */}
-            <div className="p-6">
-              <TagModal
-                tag={selectedTag}
-                isOpen={modalOpen}
-                onClose={handleCloseModal}
-                onSave={handleSave}
-                loading={loading}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Tag Create/Edit Modal - self-contained with Radix overlay */}
+      <TagModal
+        tag={selectedTag}
+        isOpen={modalOpen}
+        onClose={handleCloseModal}
+        onSave={handleSave}
+        loading={loading}
+      />
 
       {/* Delete Confirmation Modal */}
-      {deleteConfirmOpen && tagToDelete && (
-        <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-          onClick={cancelDelete}
-        >
-          <div
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between rounded-t-lg">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
-                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                  Confirm Delete
-                </h2>
-              </div>
-              <button
-                onClick={cancelDelete}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+      <ConfirmModal
+        open={deleteConfirmOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleteConfirmOpen(false);
+            setTagToDelete(null);
+          }
+        }}
+        onConfirm={confirmDelete}
+        title="Delete Tag"
+        description={`Are you sure you want to delete "${tagToDelete?.title}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        loading={deleteLoading}
+      />
 
-            {/* Modal Content */}
-            <div className="p-6">
-              <p className="text-gray-700 dark:text-gray-300 mb-6">
-                Are you sure you want to delete the tag{' '}
-                <strong className="font-semibold text-gray-900 dark:text-gray-100">
-                  "{tagToDelete.title}"
-                </strong>
-                ? This action cannot be undone.
-              </p>
-
-              {/* Action Buttons */}
-              <div className="flex justify-end gap-3">
-                <button
-                  onClick={cancelDelete}
-                  className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={confirmDelete}
-                  disabled={loading}
-                  className="px-4 py-2 text-white bg-red-600 hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed rounded-md transition-colors"
-                >
-                  {loading ? 'Deleting...' : 'Delete'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Merge Modal */}
-      {mergeModalOpen && tagToMerge && (
-        <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-          onClick={cancelMerge}
-        >
-          <div
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between rounded-t-lg">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                Merge Tags
-              </h2>
-              <button
-                onClick={cancelMerge}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Modal Content */}
-            <div className="p-6">
-              <TagMerge
-                sourceTag={tagToMerge}
-                availableTags={tags}
-                isOpen={mergeModalOpen}
-                onClose={cancelMerge}
-                onMerge={confirmMerge}
-                loading={loading}
-              />
-            </div>
-          </div>
-        </div>
+      {/* Merge Modal - self-contained with Radix overlay */}
+      {tagToMerge && (
+        <TagMerge
+          sourceTag={tagToMerge}
+          availableTags={tags}
+          isOpen={mergeModalOpen}
+          onClose={() => {
+            setMergeModalOpen(false);
+            setTagToMerge(null);
+          }}
+          onMerge={confirmMerge}
+          loading={loading}
+        />
       )}
     </div>
   );

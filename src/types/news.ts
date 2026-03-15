@@ -119,6 +119,24 @@ export interface PagedResult<T> {
 }
 
 // ============================================================================
+// Theme Configuration
+// ============================================================================
+
+export type NNewsThemeMode = 'light' | 'dark' | 'system';
+
+export interface NNewsTheme {
+  mode?: NNewsThemeMode;
+  classNames?: {
+    root?: string;
+    card?: string;
+    table?: string;
+    modal?: string;
+    button?: string;
+    input?: string;
+  };
+}
+
+// ============================================================================
 // API Configuration
 // ============================================================================
 
@@ -143,19 +161,28 @@ export interface NewsApiError {
 
 export const NEWS_API_ENDPOINTS = {
   // Articles
-  ARTICLES: '/article',
-  ARTICLES_FILTER: '/article/filter',
-  ARTICLE_BY_ID: (id: number) => `/article/${id}`,
+  ARTICLES: '/Article',
+  LIST_BY_CATEGORY: '/Article/ListByCategory',
+  LIST_BY_ROLES: '/Article/ListByRoles',
+  LIST_BY_TAG: '/Article/ListByTag',
+  SEARCH: '/Article/Search',
+  ARTICLE_BY_ID: (id: number) => `/Article/${id}`,
+  INSERT_WITH_AI: '/Article/insertWithAI',
+  UPDATE_WITH_AI: '/Article/updateWithAI',
 
   // Categories
-  CATEGORIES: '/category',
-  CATEGORIES_FILTER: '/category/filter',
-  CATEGORY_BY_ID: (id: number) => `/category/${id}`,
+  CATEGORIES: '/Category',
+  LIST_BY_PARENT: '/Category/listByParent',
+  CATEGORY_BY_ID: (id: number) => `/Category/${id}`,
 
   // Tags
-  TAGS: '/tag',
-  TAG_BY_ID: (id: number) => `/tag/${id}`,
-  TAG_MERGE: '/tag/merge',
+  TAGS: '/Tag',
+  TAGS_LIST_BY_ROLES: '/Tag/ListByRoles',
+  TAG_BY_ID: (id: number) => `/Tag/${id}`,
+  TAG_MERGE: (sourceId: number, targetId: number) => `/Tag/merge/${sourceId}/${targetId}`,
+
+  // Image
+  IMAGE_UPLOAD: '/Image/uploadImage',
 } as const;
 
 // ============================================================================

@@ -2,12 +2,15 @@ import type { AxiosInstance } from 'axios';
 import type { Article, ArticleInput, ArticleUpdate, PagedResult, AIArticleRequest } from '../types/news';
 
 const NEWS_API_ENDPOINTS = {
-  ARTICLES: '/article',
-  ARTICLES_FILTER: '/article/filter',
-  ARTICLE_BY_ID: (id: number) => `/article/${id}`,
+  ARTICLES: '/Article',
+  LIST_BY_CATEGORY: '/Article/ListByCategory',
+  LIST_BY_ROLES: '/Article/ListByRoles',
+  LIST_BY_TAG: '/Article/ListByTag',
+  SEARCH: '/Article/Search',
+  ARTICLE_BY_ID: (id: number) => `/Article/${id}`,
   IMAGE_UPLOAD: '/Image/uploadImage',
-  INSERT_WITH_AI: '/article/insertWithAI',
-  UPDATE_WITH_AI: '/article/updateWithAI',
+  INSERT_WITH_AI: '/Article/insertWithAI',
+  UPDATE_WITH_AI: '/Article/updateWithAI',
 };
 
 export class ArticleAPI {
@@ -37,16 +40,20 @@ export class ArticleAPI {
   }
 
   /**
-   * List articles with optional filtering by category
+   * List articles with optional filtering by category and status
    */
   async listArticles(
     categoryId?: number,
+    status?: number,
     page: number = 1,
     pageSize: number = 10
   ): Promise<PagedResult<Article>> {
     const params: Record<string, any> = { page, pageSize };
     if (categoryId) {
       params.categoryId = categoryId;
+    }
+    if (status !== undefined) {
+      params.status = status;
     }
     console.log('[ArticleAPI] listArticles - Request:', { url: NEWS_API_ENDPOINTS.ARTICLES, params });
 
@@ -60,28 +67,80 @@ export class ArticleAPI {
   }
 
   /**
-   * Filter articles by roles and parent category
+   * List articles by category
    */
-  async filterArticles(
-    roles?: string[],
-    parentId?: number,
+  async listByCategory(
+    categoryId: number,
     page: number = 1,
     pageSize: number = 10
   ): Promise<PagedResult<Article>> {
-    const params: Record<string, any> = { page, pageSize };
-    
-    if (roles && roles.length > 0) {
-      params.roles = roles.join(',');
-    }
-    
-    if (parentId !== undefined) {
-      params.parentId = parentId;
-    }
+    const params = { categoryId, page, pageSize };
+    console.log('[ArticleAPI] listByCategory - Request:', { url: NEWS_API_ENDPOINTS.LIST_BY_CATEGORY, params });
 
     const response = await this.client.get<PagedResult<Article>>(
-      NEWS_API_ENDPOINTS.ARTICLES_FILTER,
+      NEWS_API_ENDPOINTS.LIST_BY_CATEGORY,
       { params }
     );
+    console.log('[ArticleAPI] listByCategory - Response:', response.data);
+
+    return this.transformArticleDates(response.data);
+  }
+
+  /**
+   * List articles filtered by user roles
+   */
+  async listByRoles(
+    page: number = 1,
+    pageSize: number = 10
+  ): Promise<PagedResult<Article>> {
+    const params = { page, pageSize };
+    console.log('[ArticleAPI] listByRoles - Request:', { url: NEWS_API_ENDPOINTS.LIST_BY_ROLES, params });
+
+    const response = await this.client.get<PagedResult<Article>>(
+      NEWS_API_ENDPOINTS.LIST_BY_ROLES,
+      { params }
+    );
+    console.log('[ArticleAPI] listByRoles - Response:', response.data);
+
+    return this.transformArticleDates(response.data);
+  }
+
+  /**
+   * List articles by tag slug
+   */
+  async listByTag(
+    tagSlug: string,
+    page: number = 1,
+    pageSize: number = 10
+  ): Promise<PagedResult<Article>> {
+    const params = { tagSlug, page, pageSize };
+    console.log('[ArticleAPI] listByTag - Request:', { url: NEWS_API_ENDPOINTS.LIST_BY_TAG, params });
+
+    const response = await this.client.get<PagedResult<Article>>(
+      NEWS_API_ENDPOINTS.LIST_BY_TAG,
+      { params }
+    );
+    console.log('[ArticleAPI] listByTag - Response:', response.data);
+
+    return this.transformArticleDates(response.data);
+  }
+
+  /**
+   * Search articles by keyword
+   */
+  async search(
+    keyword: string,
+    page: number = 1,
+    pageSize: number = 10
+  ): Promise<PagedResult<Article>> {
+    const params = { keyword, page, pageSize };
+    console.log('[ArticleAPI] search - Request:', { url: NEWS_API_ENDPOINTS.SEARCH, params });
+
+    const response = await this.client.get<PagedResult<Article>>(
+      NEWS_API_ENDPOINTS.SEARCH,
+      { params }
+    );
+    console.log('[ArticleAPI] search - Response:', response.data);
 
     return this.transformArticleDates(response.data);
   }

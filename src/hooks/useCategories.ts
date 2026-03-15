@@ -35,14 +35,9 @@ export function useCategories(): UseCategoriesResult {
       try {
         let result: Category[];
 
-        if (params?.roles && params.roles.length > 0) {
-          result = await categoryApi.filterCategories(
+        if (params?.roles || params?.parentId !== undefined) {
+          result = await categoryApi.listByParent(
             params.roles,
-            params.parentId
-          );
-        } else if (params?.parentId !== undefined) {
-          result = await categoryApi.filterCategories(
-            undefined,
             params.parentId
           );
         } else {

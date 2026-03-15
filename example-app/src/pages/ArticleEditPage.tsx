@@ -57,11 +57,9 @@ export function ArticleEditPage() {
   const handleAISuccess = (article: Article) => {
     toast.success(`Article ${isEditing ? 'updated' : 'created'} successfully with AI!`);
     setShowAIModal(false);
-    // Refresh the current article data
     if (isEditing) {
       fetchArticles({ page: 1, pageSize: 100 });
     } else {
-      // Navigate to edit the new article
       navigate(`/articles/edit/${article.articleId}`);
     }
   };
@@ -70,9 +68,9 @@ export function ArticleEditPage() {
     setSaving(true);
     try {
       if (isEditing && currentArticle) {
-        await updateArticle({ 
-          ...articleData, 
-          articleId: currentArticle.articleId 
+        await updateArticle({
+          ...articleData,
+          articleId: currentArticle.articleId
         } as ArticleUpdate);
         toast.success('Article updated successfully');
       } else {
@@ -98,9 +96,9 @@ export function ArticleEditPage() {
 
   if (isEditing && articleLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-center p-8">
-          <div className="text-gray-500 dark:text-gray-400">Loading article...</div>
+          <div className="text-muted-foreground">Loading article...</div>
         </div>
       </div>
     );
@@ -108,9 +106,9 @@ export function ArticleEditPage() {
 
   if (isEditing && !currentArticle && !articleLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-4">
-          <p className="text-sm text-red-800 dark:text-red-200">
+      <div className="max-w-7xl mx-auto">
+        <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4">
+          <p className="text-sm text-red-400">
             Article not found
           </p>
         </div>
@@ -119,39 +117,39 @@ export function ArticleEditPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto animate-fade-in">
       <div className="mb-6 flex items-center justify-between">
         <button
           onClick={handleBack}
-          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm"
         >
-          <ArrowLeft className="h-5 w-5" />
+          <ArrowLeft className="h-4 w-4" />
           Back to Articles
         </button>
-        
+
         {isEditing && (
           <button
             onClick={() => setShowAIModal(true)}
-            className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-white hover:from-blue-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
+            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 px-4 py-2.5 text-sm font-medium text-white hover:from-cyan-400 hover:to-blue-400 transition-all shadow-lg shadow-cyan-500/20"
           >
-            <Sparkles className="h-5 w-5" />
+            <Sparkles className="h-4 w-4" />
             Edit with AI
           </button>
         )}
       </div>
 
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+        <h1 className="text-2xl font-bold text-foreground">
           {isEditing ? 'Edit Article' : 'New Article'}
         </h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
+        <p className="mt-1 text-sm text-muted-foreground">
           {isEditing
             ? 'Update the article information below'
             : 'Fill in the information to create a new article'}
         </p>
       </div>
 
-      <div className="rounded-lg bg-white dark:bg-gray-800 shadow p-6">
+      <div className="rounded-xl bg-card border border-border p-6">
         <ArticleEditor
           article={currentArticle}
           categories={categories || []}

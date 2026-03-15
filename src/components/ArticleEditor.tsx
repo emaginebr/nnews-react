@@ -304,43 +304,58 @@ export function ArticleEditor({
                             {t('articleEditor.featuredImage')}
                         </label>
                         
-                        {imagePreview ? (
-                            <div className="relative">
+                        <div className="relative">
+                            {imagePreview ? (
                                 <img
                                     src={imagePreview}
                                     alt="Preview"
                                     className="w-full h-[250px] object-cover rounded-md border border-gray-300 dark:border-gray-600"
-                                    style={{ height: '250px' }}
                                 />
+                            ) : (
+                                <div className="w-full h-[250px] rounded-md border border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                    <svg
+                                        className="w-16 h-16 text-gray-300 dark:text-gray-600"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={1.5}
+                                            d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"
+                                        />
+                                    </svg>
+                                </div>
+                            )}
+                            {imagePreview && (
                                 <button
                                     type="button"
                                     onClick={handleRemoveImage}
                                     className="absolute top-2 right-2 rounded-full bg-red-600 p-2 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
                                     disabled={uploadingImage}
-                                    style={{ top: '2px', right: '2px' }}
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                         <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                                     </svg>
                                 </button>
-                                {uploadingImage && (
-                                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-md">
-                                        <span className="text-white text-sm">{t('articleEditor.uploading')}</span>
-                                    </div>
-                                )}
-                            </div>
-                        ) : (
-                            <div className="flex items-center">
-                                <input
-                                    id="image"
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleImageChange}
-                                    disabled={uploadingImage}
-                                    className="block w-full text-sm text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer bg-white dark:bg-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                                />
-                            </div>
-                        )}
+                            )}
+                            {uploadingImage && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-md">
+                                    <span className="text-white text-sm">{t('articleEditor.uploading')}</span>
+                                </div>
+                            )}
+                        </div>
+                        <label htmlFor="image" className="block">
+                            <input
+                                id="image"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                disabled={uploadingImage}
+                                className="block w-full text-sm text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer bg-white dark:bg-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mt-2"
+                            />
+                        </label>
                         
                         {errors.image && <p className="text-sm text-red-600 dark:text-red-400">{errors.image}</p>}
                         <p className="text-xs text-gray-500 dark:text-gray-400">

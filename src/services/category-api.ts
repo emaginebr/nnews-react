@@ -2,9 +2,9 @@ import type { AxiosInstance } from 'axios';
 import type { Category, CategoryInput, CategoryUpdate } from '../types/news';
 
 const NEWS_API_ENDPOINTS = {
-  CATEGORIES: '/category',
-  CATEGORIES_FILTER: '/category/filter',
-  CATEGORY_BY_ID: (id: number) => `/category/${id}`,
+  CATEGORIES: '/Category',
+  LIST_BY_PARENT: '/Category/listByParent',
+  CATEGORY_BY_ID: (id: number) => `/Category/${id}`,
 };
 
 export class CategoryAPI {
@@ -21,23 +21,25 @@ export class CategoryAPI {
   }
 
   /**
-   * Filter categories by roles and parent category
+   * List categories by parent, optionally filtered by roles
    */
-  async filterCategories(roles?: string[], parentId?: number): Promise<Category[]> {
+  async listByParent(roles?: string[], parentId?: number): Promise<Category[]> {
     const params: Record<string, any> = {};
-    
+
     if (roles && roles.length > 0) {
       params.roles = roles.join(',');
     }
-    
+
     if (parentId !== undefined) {
       params.parentId = parentId;
     }
 
+    console.log('[CategoryAPI] listByParent - Request:', { url: NEWS_API_ENDPOINTS.LIST_BY_PARENT, params });
     const response = await this.client.get<Category[]>(
-      NEWS_API_ENDPOINTS.CATEGORIES_FILTER,
+      NEWS_API_ENDPOINTS.LIST_BY_PARENT,
       { params }
     );
+    console.log('[CategoryAPI] listByParent - Response:', response.data);
 
     return this.transformCategoryDates(response.data);
   }

@@ -37,15 +37,26 @@ export function useArticles(): UseArticlesResult {
         let result: PagedResult<Article>;
 
         if (params?.roles && params.roles.length > 0) {
-          result = await articleApi.filterArticles(
-            params.roles,
-            params.categoryId,
+          result = await articleApi.listByRoles(
+            params.page,
+            params.pageSize
+          );
+        } else if (params?.searchTerm) {
+          result = await articleApi.search(
+            params.searchTerm,
+            params.page,
+            params.pageSize
+          );
+        } else if (params?.tags && params.tags.length > 0) {
+          result = await articleApi.listByTag(
+            String(params.tags[0]),
             params.page,
             params.pageSize
           );
         } else {
           result = await articleApi.listArticles(
             params?.categoryId,
+            params?.status,
             params?.page,
             params?.pageSize
           );

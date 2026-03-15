@@ -28,7 +28,7 @@ export function ArticleViewer({
           {onBack && (
             <button
               onClick={onBack}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
             >
               <svg
                 className="h-5 w-5"
@@ -50,7 +50,7 @@ export function ArticleViewer({
           {showActions && onEdit && (
             <button
               onClick={() => onEdit(article)}
-              className="flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+              className="flex items-center gap-2 rounded-lg bg-blue-600 dark:bg-blue-500 px-4 py-2 text-white hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
             >
               <svg
                 className="h-5 w-5"
@@ -72,12 +72,12 @@ export function ArticleViewer({
       )}
 
       {/* Article Header */}
-      <article className="rounded-lg bg-white p-8 shadow-md">
-        <header className="border-b border-gray-200 pb-6">
-          <h1 className="text-4xl font-bold text-gray-900">{article.title}</h1>
+      <article className="rounded-xl bg-white dark:bg-gray-800 p-8 shadow-md border border-gray-200 dark:border-gray-700">
+        <header className="border-b border-gray-200 dark:border-gray-700 pb-6">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100">{article.title}</h1>
 
           {/* Meta Information */}
-          <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-gray-500">
+          <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
             {article.dateAt && (
               <span className="flex items-center gap-2">
                 <svg
@@ -102,7 +102,7 @@ export function ArticleViewer({
             )}
 
             {article.category && (
-              <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800">
+              <span className="rounded-full bg-blue-100 dark:bg-blue-900/30 px-3 py-1 text-xs font-medium text-blue-800 dark:text-blue-300">
                 {article.category.title}
               </span>
             )}
@@ -110,14 +110,14 @@ export function ArticleViewer({
             <span
               className={`rounded-full px-3 py-1 text-xs font-medium ${
                 article.status === ArticleStatus.Published
-                  ? 'bg-green-100 text-green-800'
+                  ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
                   : article.status === ArticleStatus.Draft
-                  ? 'bg-gray-100 text-gray-800'
+                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
                   : article.status === ArticleStatus.Review
-                  ? 'bg-yellow-100 text-yellow-800'
+                  ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
                   : article.status === ArticleStatus.Scheduled
-                  ? 'bg-purple-100 text-purple-800'
-                  : 'bg-orange-100 text-orange-800'
+                  ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300'
+                  : 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300'
               }`}
             >
               {ArticleStatus[article.status]}
@@ -130,7 +130,7 @@ export function ArticleViewer({
               {article.tags.map((tag) => (
                 <span
                   key={tag.tagId}
-                  className="rounded-md bg-gray-100 px-3 py-1 text-sm text-gray-700"
+                  className="rounded-md bg-gray-100 dark:bg-gray-700 px-3 py-1 text-sm text-gray-700 dark:text-gray-300"
                 >
                   #{tag.title}
                 </span>
@@ -144,7 +144,7 @@ export function ArticleViewer({
               {article.roles.map((role) => (
                 <span
                   key={role.slug}
-                  className="rounded-md bg-purple-100 px-3 py-1 text-sm text-purple-700"
+                  className="rounded-md bg-purple-100 dark:bg-purple-900/30 px-3 py-1 text-sm text-purple-700 dark:text-purple-300"
                 >
                   {role.name}
                 </span>
@@ -154,7 +154,7 @@ export function ArticleViewer({
         </header>
 
         {/* Article Content */}
-        <div className="prose prose-lg mt-8 max-w-none">
+        <div className="prose prose-lg dark:prose-invert mt-8 max-w-none">
           {article.contentType === ContentType.PlainText ? (
             <pre className="whitespace-pre-wrap font-sans">{article.content}</pre>
           ) : article.contentType === ContentType.Html ? (

@@ -1,68 +1,135 @@
-# nnews-react
+# nnews-react - React Component Library for NNews CMS
 
-Complete React component library for NAuth authentication and NNews content management system. Built with TypeScript, Tailwind CSS, and designed as a distributable NPM package.
+![React](https://img.shields.io/badge/React-18+-61DAFB?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)
+![npm version](https://img.shields.io/npm/v/nnews-react.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
-[![npm version](https://img.shields.io/npm/v/nnews-react.svg)](https://www.npmjs.com/package/nnews-react)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+## Overview
 
-## Features
+**nnews-react** is a React component library (npm package) for the NNews content management system. It provides ready-made components, hooks, API services, context providers, and a theming system that consuming applications integrate via `NNewsProvider`. Includes AI-powered article generation with ChatGPT and DALL-E 3.
 
-### Authentication (NAuth)
-✨ **Complete Auth Suite** - Login, Register, Password Recovery, Change Password  
-👤 **User Management** - Full CRUD with profile editing  
-🎭 **Role Management** - Role-based access control  
-🎯 **Security** - Device fingerprinting with FingerprintJS  
-🔒 **Type-Safe** - Full TypeScript support  
+Built with **TypeScript**, **Tailwind CSS**, **Radix UI**, and **i18next** for internationalization (English and Portuguese).
 
-### Content Management (NNews)
-📝 **Article Management** - Full CRUD with Markdown editor  
-📂 **Category System** - Hierarchical categories with parent-child relationships  
-🏷️ **Tag Management** - Flexible tagging with merge functionality  
-✍️ **Markdown Editor** - Live preview with syntax highlighting  
-👁️ **Article Viewer** - Beautiful article display with GitHub-flavored Markdown  
-🔐 **Access Control** - Role-based content visibility  
+The `example-app/` directory contains a full working application demonstrating library usage in dark mode.
 
-### General
-🎨 **Theme Support** - Light/Dark mode with system detection  
-📦 **Tree-shakeable** - Import only what you need  
-♿ **Accessible** - WCAG compliant  
-📱 **Responsive** - Mobile-first design  
+---
 
-## Installation
+## 🚀 Features
 
-```bash
-npm install nnews-react react react-dom react-router-dom
+### Content Management
+- 📝 **Article Management** — Full CRUD with rich text (Quill), Markdown, and plain text editors
+- 🤖 **AI-Powered Content** — Create and update articles with ChatGPT, generate images with DALL-E 3
+- 📂 **Hierarchical Categories** — Parent-child category system with full CRUD
+- 🏷️ **Tag System** — Flexible tagging with merge functionality
+- 🔍 **Search & Filters** — Search articles by keyword, filter by category, status, tag, or roles
+- 📄 **Pagination** — Built-in `PagedResult<T>` pattern with `hasNext`/`hasPrevious`
+- 🖼️ **Image Upload** — Featured image upload with preview and placeholder fallback
 
-# If you don't have Tailwind CSS
-npm install -D tailwindcss postcss autoprefixer tailwindcss-animate
-npx tailwindcss init -p
+### Architecture
+- 🎨 **Theme System** — Configurable `light`/`dark`/`system` mode via `NNewsConfig.theme`
+- 🌍 **Internationalization** — i18next with `nnews` namespace, EN/PT built-in, extensible
+- 🏢 **Multi-tenancy** — `X-Tenant-Id` header injection via Axios interceptor
+- 🔐 **Role-based Access** — Content visibility control per role
+- 📦 **Tree-shakeable** — ESM + CJS dual output, import only what you need
+- ♿ **Accessible** — Radix UI primitives with focus trapping, keyboard navigation, ARIA
+- 📱 **Responsive** — Mobile-first Tailwind CSS design
+
+### UI System
+- 🪟 **Normalized Modals** — All modals use a single Radix-based `Modal` component
+- ✅ **ConfirmModal** — Reusable confirmation dialog with danger/warning/default variants
+- 🧩 **UI Primitives** — Button, Input, Label, Avatar, Modal components
+
+---
+
+## 🛠️ Technologies Used
+
+### Core
+- **React 18+** — UI framework (peer dependency)
+- **TypeScript 5** — Type safety
+- **Vite** — Build tooling with SWC plugin
+
+### Styling & UI
+- **Tailwind CSS** — Utility-first CSS with class-based dark mode
+- **Radix UI** — Accessible Dialog, Dropdown, Select, Tabs, Toast primitives
+- **class-variance-authority** — Component variant system
+- **lucide-react** — Icon library
+
+### Editors
+- **react-quill-new** — WYSIWYG rich text editor (HTML)
+- **react-markdown** + **remark-gfm** + **rehype-highlight** — Markdown rendering with syntax highlighting
+
+### State & Data
+- **Axios** — HTTP client with interceptors
+- **react-hook-form** + **Zod** — Form handling and validation
+- **i18next** + **react-i18next** — Internationalization
+
+### Testing
+- **Vitest** — Unit test runner with coverage
+
+---
+
+## 📁 Project Structure
+
+```
+nnews-react/
+├── src/
+│   ├── components/          # React components
+│   │   ├── ui/              # Primitives (Button, Input, Modal, ConfirmModal, etc.)
+│   │   ├── ArticleList.tsx  # Article grid with image placeholders
+│   │   ├── ArticleEditor.tsx # Multi-format article editor
+│   │   ├── ArticleViewer.tsx # Article display (Markdown/HTML/Plain)
+│   │   ├── AIArticleGenerator.tsx # AI content generation modal
+│   │   ├── CategoryList.tsx # Category table
+│   │   ├── CategoryModal.tsx # Category create/edit modal
+│   │   ├── TagList.tsx      # Tag chips with actions
+│   │   ├── TagModal.tsx     # Tag create/edit modal
+│   │   ├── TagMerge.tsx     # Tag merge modal
+│   │   ├── RichTextEditor.tsx # Quill WYSIWYG editor
+│   │   └── MarkdownEditor.tsx # Markdown editor with preview
+│   ├── contexts/            # NNewsContext (provider, config, Axios setup)
+│   ├── hooks/               # useArticles, useCategories, useTags
+│   ├── services/            # ArticleAPI, CategoryAPI, TagAPI
+│   ├── types/               # TypeScript types, enums, theme config
+│   ├── i18n/                # i18next setup, EN/PT translations
+│   ├── utils/               # cn(), validators
+│   ├── styles/              # Tailwind CSS base styles
+│   └── index.ts             # Public API exports
+├── example-app/             # Full demo application (dark mode)
+├── docs/                    # Additional documentation
+├── dist/                    # Build output (ESM + CJS + types + CSS)
+└── package.json
 ```
 
-### Configure Tailwind
+---
+
+## ⚙️ Installation
+
+```bash
+npm install nnews-react
+```
+
+**Peer dependencies:**
+
+```bash
+npm install react react-dom react-router-dom nauth-react
+```
+
+**Tailwind CSS setup:**
+
+```bash
+npm install -D tailwindcss postcss autoprefixer tailwindcss-animate
+```
 
 ```javascript
 // tailwind.config.js
 export default {
   darkMode: ['class'],
   content: [
-    './src/**/*.{js,ts,jsx,tsx}',
-    './node_modules/nnews-react/dist/**/*.{js,ts,jsx,tsx}',
+    './src/**/*.{ts,tsx}',
+    './node_modules/nnews-react/dist/**/*.{js,mjs}',
   ],
-  theme: {
-    extend: {
-      typography: {
-        DEFAULT: {
-          css: {
-            maxWidth: 'none',
-          },
-        },
-      },
-    },
-  },
-  plugins: [
-    require('tailwindcss-animate'),
-    require('@tailwindcss/typography'), // For Markdown rendering
-  ],
+  plugins: [require('tailwindcss-animate')],
 };
 ```
 
@@ -73,321 +140,152 @@ export default {
 @tailwind utilities;
 ```
 
-## Quick Start
+---
 
-### 1. Setup Providers
+## 📖 Quick Start
+
+### 1. Setup Provider
 
 ```tsx
-import { BrowserRouter } from 'react-router-dom';
-import { NAuthProvider, NNewsProvider, ThemeProvider } from 'nnews-react';
+import { NNewsProvider } from 'nnews-react';
 import 'nnews-react/styles';
-import './index.css';
 
 function App() {
   return (
-    <BrowserRouter>
-      <ThemeProvider defaultTheme="system">
-        <NAuthProvider
-          config={{
-            apiUrl: import.meta.env.VITE_API_URL,
-            enableFingerprinting: true,
-          }}
-        >
-          <NNewsProvider
-            config={{
-              apiUrl: import.meta.env.VITE_API_URL,
-            }}
-          >
-            <YourApp />
-          </NNewsProvider>
-        </NAuthProvider>
-      </ThemeProvider>
-    </BrowserRouter>
-  );
-}
-```
-
-```env
-# .env
-VITE_API_URL=https://your-nauth-api.com
-```
-
-### 2. Use Authentication Components
-
-```tsx
-import {
-  LoginForm,
-  RegisterForm,
-  UserEditForm,
-  RoleList,
-  SearchForm,
-  useAuth,
-  useProtectedRoute,
-} from 'nnews-react';
-import { useNavigate } from 'react-router-dom';
-
-// Login Page
-function LoginPage() {
-  const navigate = useNavigate();
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <LoginForm
-        onSuccess={() => navigate('/dashboard')}
-        showRememberMe
-        showForgotPassword
-      />
-    </div>
-  );
-}
-
-// Protected Dashboard
-function Dashboard() {
-  const { user, logout } = useAuth();
-  useProtectedRoute({ redirectTo: '/login' });
-
-  return (
-    <div>
-      <h1>Welcome, {user?.name}</h1>
-      <button onClick={logout}>Logout</button>
-    </div>
-  );
-}
-
-// User Management
-function CreateUserPage() {
-  const navigate = useNavigate();
-  return (
-    <UserEditForm
-      onSuccess={(user) => {
-        console.log('User created:', user);
-        navigate('/users');
+    <NNewsProvider
+      config={{
+        apiUrl: import.meta.env.VITE_NNEWS_API_URL,
+        tenantId: import.meta.env.VITE_TENANT_ID,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        language: 'en',        // 'en' | 'pt'
+        theme: {
+          mode: 'dark',        // 'light' | 'dark' | 'system'
+        },
       }}
-      onCancel={() => navigate('/users')}
-    />
+    >
+      <YourApp />
+    </NNewsProvider>
   );
 }
 ```
 
-### 3. Use Content Management Components
+### 2. Use Components
 
 ```tsx
 import {
   ArticleList,
-  ArticleViewer,
   ArticleEditor,
+  ArticleViewer,
+  AIArticleGenerator,
   CategoryList,
   CategoryModal,
   TagList,
   TagModal,
+  TagMerge,
+  ConfirmModal,
   useArticles,
   useCategories,
   useTags,
 } from 'nnews-react';
+```
 
-// Articles List Page
+### 3. Fetch and Display Articles
+
+```tsx
 function ArticlesPage() {
   const { articles, loading, fetchArticles, deleteArticle } = useArticles();
 
   useEffect(() => {
-    fetchArticles({ page: 1, pageSize: 20 });
+    fetchArticles({ page: 1, pageSize: 10, status: 1 }); // Published only
   }, []);
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Articles</h1>
-      <ArticleList
-        articles={articles}
-        loading={loading}
-        onArticleClick={(article) => navigate(`/articles/${article.id}`)}
-        onEditClick={(article) => navigate(`/articles/${article.id}/edit`)}
-        onDeleteClick={deleteArticle}
-        showActions
-      />
-    </div>
-  );
-}
-
-// Article Viewer Page
-function ArticleViewPage({ articleId }: { articleId: number }) {
-  const { getArticleById } = useArticles();
-  const [article, setArticle] = useState(null);
-
-  useEffect(() => {
-    getArticleById(articleId).then(setArticle);
-  }, [articleId]);
-
-  if (!article) return <div>Loading...</div>;
-
-  return (
-    <ArticleViewer
-      article={article}
-      onBack={() => navigate('/articles')}
-      onEdit={(article) => navigate(`/articles/${article.id}/edit`)}
+    <ArticleList
+      articles={articles}
+      loading={loading}
+      onArticleClick={(article) => navigate(`/articles/${article.articleId}`)}
+      onEditClick={(article) => navigate(`/articles/edit/${article.articleId}`)}
+      onDeleteClick={(article) => setArticleToDelete(article)}
       showActions
     />
   );
 }
+```
 
-// Article Editor Page
-function ArticleEditorPage({ articleId }: { articleId?: number }) {
-  const { createArticle, updateArticle, getArticleById } = useArticles();
-  const { categories } = useCategories();
-  const { tags } = useTags();
-  const [article, setArticle] = useState(null);
+---
 
-  useEffect(() => {
-    if (articleId) {
-      getArticleById(articleId).then(setArticle);
-    }
-    fetchCategories();
-    fetchTags();
-  }, [articleId]);
+## 🔧 NNewsProvider Configuration
 
-  const handleSave = async (data) => {
-    if (article) {
-      await updateArticle({ ...data, id: article.id });
-    } else {
-      await createArticle(data);
-    }
-    navigate('/articles');
+```tsx
+interface NNewsConfig {
+  apiUrl: string;                              // Required — NNews API base URL
+  tenantId?: string;                           // Multi-tenant ID (X-Tenant-Id header)
+  apiClient?: AxiosInstance;                   // Custom Axios instance
+  headers?: Record<string, string>;            // Dynamic headers (e.g., Authorization)
+  language?: string;                           // 'en' | 'pt' (default: 'en')
+  translations?: Record<string, Record<string, unknown>>; // Custom translations
+  theme?: {
+    mode?: 'light' | 'dark' | 'system';       // Theme mode (default: 'system')
+    classNames?: {                             // CSS class overrides
+      root?: string;
+      card?: string;
+      table?: string;
+      modal?: string;
+      button?: string;
+      input?: string;
+    };
   };
-
-  return (
-    <ArticleEditor
-      article={article}
-      categories={categories}
-      tags={tags}
-      onSave={handleSave}
-      onCancel={() => navigate('/articles')}
-    />
-  );
-}
-
-// Category Management
-function CategoriesPage() {
-  const { categories, createCategory, updateCategory, deleteCategory } = useCategories();
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-
-  return (
-    <div className="container mx-auto p-6">
-      <div className="flex justify-between mb-6">
-        <h1 className="text-3xl font-bold">Categories</h1>
-        <button onClick={() => setModalOpen(true)}>New Category</button>
-      </div>
-      <CategoryList
-        categories={categories}
-        onEditClick={(cat) => {
-          setSelectedCategory(cat);
-          setModalOpen(true);
-        }}
-        onDeleteClick={deleteCategory}
-        showActions
-      />
-      <CategoryModal
-        isOpen={modalOpen}
-        onClose={() => {
-          setModalOpen(false);
-          setSelectedCategory(null);
-        }}
-        category={selectedCategory}
-        categories={categories}
-        onSave={selectedCategory ? updateCategory : createCategory}
-      />
-    </div>
-  );
 }
 ```
 
-## Components
+The provider creates an Axios instance with request interceptors that inject `Authorization` and `X-Tenant-Id` headers dynamically. It also wraps children in a themed container with the `dark` class when appropriate.
 
-### Authentication Components
-- `LoginForm` - Email/password login with validation
-- `RegisterForm` - Multi-step registration with password strength
-- `ForgotPasswordForm` - Password recovery request
-- `ResetPasswordForm` - Password reset with token
-- `ChangePasswordForm` - Change password for authenticated users
+---
 
-### User Management
-- `UserEditForm` - Create and edit users with full profile management (dual mode)
-- `SearchForm` - Search and browse users with pagination
+## 📚 Hooks API
 
-### Role Management
-- `RoleList` - List and manage roles with CRUD operations
-- `RoleForm` - Create and edit roles
+### useArticles
 
-### Content Management (News)
-- `ArticleList` - Display paginated list of articles with actions
-- `ArticleViewer` - Beautiful article display with Markdown rendering
-- `ArticleEditor` - Full-featured article editor with Markdown support
-- `MarkdownEditor` - Standalone Markdown editor with live preview
-- `CategoryList` - Display and manage categories
-- `CategoryModal` - Modal for creating/editing categories
-- `TagList` - Display and manage tags
-- `TagModal` - Modal for creating/editing tags
-
-### UI Components
-`Button`, `Input`, `Label`, `Card`, `Avatar`, `DropdownMenu`, `Toaster`
-
-## Hooks
-
-### Authentication Hooks
 ```tsx
-// Authentication state
-const { user, isAuthenticated, login, logout, isLoading } = useAuth();
-
-// User management
 const {
-  user,
-  updateUser,
-  createUser,
-  getUserById,
-  changePassword,
-  uploadImage,
-  searchUsers,
-} = useUser();
-
-// Role management
-const { fetchRoles, getRoleById, createRole, updateRole, deleteRole } = useNAuth();
-
-// Route protection
-useProtectedRoute({ redirectTo: '/login', requireAdmin: false });
-
-// Theme management
-const { theme, setTheme } = useTheme();
-```
-
-### Content Management Hooks
-```tsx
-// Article management
-const {
-  articles,
-  loading,
-  error,
-  fetchArticles,
-  getArticleById,
-  createArticle,
-  updateArticle,
-  deleteArticle,
-  refresh,
+  articles,         // PagedResult<Article> | null
+  loading,          // boolean
+  error,            // Error | null
+  fetchArticles,    // (params?: ArticleSearchParams) => Promise<void>
+  getArticleById,   // (id: number) => Promise<Article>
+  createArticle,    // (article: ArticleInput) => Promise<Article>
+  updateArticle,    // (article: ArticleUpdate) => Promise<Article>
+  deleteArticle,    // (id: number) => Promise<void>
+  refresh,          // () => Promise<void>
 } = useArticles();
 
-// Category management
+// ArticleSearchParams supports:
+// categoryId, status, roles, tags, searchTerm, page, pageSize
+```
+
+### useCategories
+
+```tsx
 const {
-  categories,
+  categories,       // Category[]
   loading,
   error,
-  fetchCategories,
+  fetchCategories,  // (params?: CategoryFilterParams) => Promise<void>
   getCategoryById,
   createCategory,
   updateCategory,
   deleteCategory,
   refresh,
 } = useCategories();
+```
 
-// Tag management
+### useTags
+
+```tsx
 const {
-  tags,
+  tags,             // Tag[]
   loading,
   error,
   fetchTags,
@@ -395,181 +293,258 @@ const {
   createTag,
   updateTag,
   deleteTag,
-  mergeTags,
+  mergeTags,        // (sourceId: number, targetId: number) => Promise<void>
   refresh,
 } = useTags();
 ```
 
-## Configuration
+---
 
-### NAuth Configuration
-```tsx
-<NAuthProvider
-  config={{
-    apiUrl: 'https://your-api.com',           // Required
-    timeout: 30000,                            // Optional
-    enableFingerprinting: true,                // Optional
-    storageType: 'localStorage',               // Optional
-    redirectOnUnauthorized: '/login',          // Optional
-    onAuthChange: (user) => {},                // Optional
-    onLogin: (user) => {},                     // Optional
-    onLogout: () => {},                        // Optional
-  }}
->
-  <App />
-</NAuthProvider>
-```
+## 🔌 API Services
 
-### NNews Configuration
-```tsx
-<NNewsProvider
-  config={{
-    apiUrl: 'https://your-api.com',           // Required
-    timeout: 30000,                            // Optional
-  }}
->
-  <App />
-</NNewsProvider>
-```
+The library exposes class-based API clients that can be used directly:
 
-## API Clients
-
-### NAuth API Client
-```tsx
-import { createNAuthClient } from 'nnews-react';
-
-const authApi = createNAuthClient({ apiUrl: 'https://your-api.com' });
-
-await authApi.login({ email, password });
-await authApi.getMe();
-await authApi.updateUser({ name: 'New Name' });
-await authApi.uploadImage(file);
-```
-
-### NNews API Services
 ```tsx
 import { ArticleAPI, CategoryAPI, TagAPI } from 'nnews-react';
 import axios from 'axios';
 
-const apiClient = axios.create({ baseURL: 'https://your-api.com' });
+const client = axios.create({ baseURL: 'https://your-api.com' });
+const articleApi = new ArticleAPI(client);
 
-// Article API
-const articleApi = new ArticleAPI(apiClient);
-await articleApi.listArticles();
+// Article endpoints
+await articleApi.listArticles(categoryId?, status?, page, pageSize);
+await articleApi.listByCategory(categoryId, page, pageSize);
+await articleApi.listByRoles(page, pageSize);
+await articleApi.listByTag(tagSlug, page, pageSize);
+await articleApi.search(keyword, page, pageSize);
 await articleApi.getArticleById(id);
 await articleApi.createArticle(data);
 await articleApi.updateArticle(data);
 await articleApi.deleteArticle(id);
+await articleApi.uploadImage(file);
+await articleApi.createArticleWithAI(request);
+await articleApi.updateArticleWithAI(request);
 
-// Category API
-const categoryApi = new CategoryAPI(apiClient);
+// Category endpoints
+const categoryApi = new CategoryAPI(client);
 await categoryApi.listCategories();
+await categoryApi.listByParent(roles?, parentId?);
+await categoryApi.getCategoryById(id);
 await categoryApi.createCategory(data);
+await categoryApi.updateCategory(data);
+await categoryApi.deleteCategory(id);
 
-// Tag API
-const tagApi = new TagAPI(apiClient);
+// Tag endpoints
+const tagApi = new TagAPI(client);
 await tagApi.listTags();
+await tagApi.listByRoles();
+await tagApi.getTagById(id);
+await tagApi.createTag(data);
+await tagApi.updateTag(data);
+await tagApi.deleteTag(id);
 await tagApi.mergeTags(sourceId, targetId);
 ```
 
-## Customization
+---
 
-```tsx
-<LoginForm
-  className="shadow-2xl"
-  styles={{
-    container: 'bg-white',
-    button: 'bg-purple-600',
-  }}
-/>
-```
+## 🪟 Modal System
 
-## Utilities
+All modals use a single normalized `Modal` component built on Radix UI Dialog:
 
 ```tsx
 import {
-  validateCPF,
-  validateCNPJ,
-  validateEmail,
-  formatPhone,
-  validatePasswordStrength,
-  cn, // Utility for merging Tailwind classes
+  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
+  ModalTitle, ModalDescription, ModalClose,
+  ConfirmModal,
 } from 'nnews-react';
+
+// Confirmation dialog
+<ConfirmModal
+  open={isOpen}
+  onOpenChange={setIsOpen}
+  onConfirm={handleDelete}
+  title="Delete Article"
+  description="This action cannot be undone."
+  confirmLabel="Delete"
+  variant="danger"    // 'danger' | 'warning' | 'default'
+  loading={isDeleting}
+/>
+
+// Custom modal
+<Modal open={isOpen} onOpenChange={setIsOpen}>
+  <ModalContent className="max-w-2xl">
+    <ModalHeader>
+      <ModalTitle>Edit Item</ModalTitle>
+      <ModalDescription>Fill in the details below.</ModalDescription>
+    </ModalHeader>
+    <ModalBody>
+      {/* Your form content */}
+    </ModalBody>
+    <ModalFooter>
+      <ModalClose asChild>
+        <button>Cancel</button>
+      </ModalClose>
+      <button onClick={handleSave}>Save</button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
 ```
 
-## Markdown Support
+---
 
-The Markdown editor supports:
+## 🌍 Internationalization
 
-- **Basic Formatting**: Bold, italic, strikethrough
-- **Headers**: H1-H6
-- **Lists**: Ordered and unordered
-- **Links**: Inline and reference-style
-- **Images**: Inline images
-- **Code**: Inline code and fenced code blocks with syntax highlighting
-- **Tables**: GitHub-flavored tables
-- **Task Lists**: GitHub-style checkboxes
-- **Blockquotes**: Quote blocks
+Built-in translations for English and Portuguese. Extend with custom translations:
 
-## TypeScript
+```tsx
+<NNewsProvider
+  config={{
+    apiUrl: '...',
+    language: 'pt',
+    translations: {
+      en: { custom_key: 'Custom value' },
+      pt: { custom_key: 'Valor customizado' },
+    },
+  }}
+>
+```
+
+---
+
+## 🔒 TypeScript Types
 
 ```tsx
 import type {
-  // Auth types
-  UserInfo,
-  LoginCredentials,
-  NAuthConfig,
-  Theme,
-  // News types
-  Article,
-  Category,
-  Tag,
-  ArticleStatus,
-  ArticleInput,
-  ArticleUpdate,
-  CategoryInput,
-  CategoryUpdate,
-  TagInput,
-  TagUpdate,
+  Article, ArticleInput, ArticleUpdate, AIArticleRequest,
+  Category, CategoryInput, CategoryUpdate,
+  Tag, TagInput, TagUpdate,
+  PagedResult, Role,
+  NNewsConfig, NNewsTheme, NNewsThemeMode,
+  ArticleSearchParams, CategoryFilterParams, TagSearchParams,
 } from 'nnews-react';
+
+import { ArticleStatus, ContentType } from 'nnews-react';
+// ArticleStatus: Draft(0), Published(1), Archived(2), Scheduled(3), Review(4)
+// ContentType: PlainText(1), Html(2), MarkDown(3)
 ```
 
-## Project Structure
+---
 
-```
-src/
-├── components/       # Auth forms + News components + UI components
-├── contexts/         # NAuthContext, NNewsContext, ThemeContext
-├── hooks/            # useAuth, useUser, useArticles, useCategories, useTags, etc.
-├── services/         # NAuth API client + News API services
-├── types/            # TypeScript definitions (auth + news)
-├── utils/            # Validators, formatters, utilities
-└── styles/           # Tailwind CSS
-```
-
-## Development
+## ⚙️ Environment Variables (Example App)
 
 ```bash
-npm install        # Install dependencies
-npm run dev        # Development mode
-npm run build      # Build library
-npm test           # Run tests
-npm run lint       # Run ESLint
+cp example-app/.env.example example-app/.env
 ```
 
-## Publishing
+```bash
+VITE_API_URL=http://localhost:5007        # NAuth backend URL
+VITE_NNEWS_API_URL=http://localhost:5008  # NNews backend URL
+VITE_TENANT_ID=my-tenant                  # Tenant identifier
+```
+
+---
+
+## 🧪 Testing
+
+```bash
+npm test                # Run tests once
+npm run test:watch      # Watch mode
+npm run test:coverage   # Coverage report (text, JSON, HTML)
+```
+
+---
+
+## 🔧 Development
+
+```bash
+# Library (root)
+npm install             # Install dependencies
+npm run dev             # Vite dev server
+npm run build           # Type-check + Vite build (outputs to dist/)
+npm run lint            # ESLint
+npm run type-check      # tsc --noEmit
+
+# Example App (example-app/)
+cd example-app
+npm install
+npm run dev             # Start dev server
+npm run build           # Production build
+```
+
+### Build Output
+
+The library outputs both ESM and CJS with TypeScript declarations:
+
+| File | Description |
+|------|-------------|
+| `dist/index.js` | ES Module bundle |
+| `dist/index.cjs` | CommonJS bundle |
+| `dist/index.d.ts` | TypeScript declarations |
+| `dist/style.css` | Bundled CSS styles |
+
+---
+
+## 🔄 CI/CD
+
+### GitHub Actions
+
+- **version-tag.yml** — Semantic versioning with GitVersion on push to `main`
+- **npm-publish.yml** — Publishes to NPM on tag creation
+- **create-release.yml** — GitHub release creation
+
+---
+
+## 📖 Additional Documentation
+
+| Document | Description |
+|----------|-------------|
+| [AI Features Guide](docs/AI_FEATURES_GUIDE.md) | ChatGPT and DALL-E 3 integration details |
+| [Changelog](docs/CHANGELOG.md) | Version history and changes |
+| [Role API Documentation](docs/ROLE_API_DOCUMENTATION.md) | Role management API reference |
+| [Testing Guide](docs/TESTING_GUIDE.md) | Testing patterns and conventions |
+| [Update Summary](docs/UPDATE_SUMMARY.md) | Recent update summary |
+| [User API Documentation](docs/USER_API_DOCUMENTATION.md) | User management API reference |
+
+---
+
+## 📦 Publishing
 
 ```bash
 npm run build
 npm publish --access public
 ```
 
-## License
+---
 
-MIT © [Rodrigo Landim](https://github.com/landim32)
+## 🤝 Contributing
 
-## Links
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run tests (`npm test`)
+5. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
 
-- [GitHub](https://github.com/landim32/NNews.React)
-- [NPM](https://www.npmjs.com/package/nnews-react)
-- [Documentation](https://github.com/landim32/NNews.React#readme)
+---
+
+## 👨‍💻 Author
+
+Developed by **[Rodrigo Landim](https://github.com/landim32)**
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 📞 Support
+
+- **Issues**: [GitHub Issues](https://github.com/landim32/NNews.React/issues)
+- **NPM**: [nnews-react](https://www.npmjs.com/package/nnews-react)
+
+---
+
+**⭐ If you find this project useful, please consider giving it a star!**

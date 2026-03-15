@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import type { Category, CategoryInput, CategoryUpdate } from '../types/news';
 import { useNNewsTranslation } from '../i18n';
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalTitle,
+  ModalClose,
+} from './ui/Modal';
 
 export interface CategoryModalProps {
   category?: Category | null;
@@ -41,21 +50,16 @@ export function CategoryModal({
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-
     if (!title.trim()) {
       newErrors.title = t('validation.titleRequired');
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     const categoryData = {
       title: title.trim(),
@@ -74,76 +78,84 @@ export function CategoryModal({
     }
   };
 
-  if (!isOpen) return null;
+  const handleOpenChange = (open: boolean) => {
+    if (!open) onClose();
+  };
 
-  // Filter out the current category from parent options to prevent self-referencing
   const availableParents = categories.filter((c) => c.categoryId !== category?.categoryId);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
-        <h2 className="mb-4 text-2xl font-bold text-gray-900">
-          {category ? t('categoryModal.editCategory') : t('categoryModal.createCategory')}
-        </h2>
+    <Modal open={isOpen} onOpenChange={handleOpenChange}>
+      <ModalContent>
+        <ModalHeader>
+          <ModalTitle>
+            {category ? t('categoryModal.editCategory') : t('categoryModal.createCategory')}
+          </ModalTitle>
+        </ModalHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-              {t('common.titleRequired')}
-            </label>
-            <input
-              id="title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className={`w-full rounded-md border ${
-                errors.title ? 'border-red-300' : 'border-gray-300'
-              } px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
-              placeholder={t('categoryModal.enterTitle')}
-            />
-            {errors.title && <p className="text-sm text-red-600">{errors.title}</p>}
-          </div>
+        <form onSubmit={handleSubmit}>
+          <ModalBody>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="cat-title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('common.titleRequired')}
+                </label>
+                <input
+                  id="cat-title"
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className={`w-full rounded-lg border ${
+                    errors.title ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'
+                  } px-4 py-2.5 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 placeholder:text-gray-400 dark:placeholder:text-gray-500`}
+                  placeholder={t('categoryModal.enterTitle')}
+                />
+                {errors.title && <p className="text-sm text-red-600 dark:text-red-400">{errors.title}</p>}
+              </div>
 
-          {availableParents.length > 0 && (
-            <div className="space-y-2">
-              <label htmlFor="parent" className="block text-sm font-medium text-gray-700">
-                {t('categoryModal.parentCategory')}
-              </label>
-              <select
-                id="parent"
-                value={parentId || ''}
-                onChange={(e) => setParentId(e.target.value ? Number(e.target.value) : null)}
-                className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              >
-                <option value="">{t('categoryModal.noneTopLevel')}</option>
-                {availableParents.map((cat) => (
-                  <option key={cat.categoryId} value={cat.categoryId}>
-                    {cat.title}
-                  </option>
-                ))}
-              </select>
+              {availableParents.length > 0 && (
+                <div className="space-y-2">
+                  <label htmlFor="cat-parent" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {t('categoryModal.parentCategory')}
+                  </label>
+                  <select
+                    id="cat-parent"
+                    value={parentId || ''}
+                    onChange={(e) => setParentId(e.target.value ? Number(e.target.value) : null)}
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2.5 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400"
+                  >
+                    <option value="">{t('categoryModal.noneTopLevel')}</option>
+                    {availableParents.map((cat) => (
+                      <option key={cat.categoryId} value={cat.categoryId}>
+                        {cat.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
-          )}
+          </ModalBody>
 
-          <div className="flex justify-end gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={loading}
-              className="rounded-md border border-gray-300 px-6 py-2 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-            >
-              {t('common.cancel')}
-            </button>
+          <ModalFooter>
+            <ModalClose asChild>
+              <button
+                type="button"
+                disabled={loading}
+                className="rounded-lg border border-gray-300 dark:border-gray-600 px-6 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
+              >
+                {t('common.cancel')}
+              </button>
+            </ModalClose>
             <button
               type="submit"
               disabled={loading}
-              className="rounded-md bg-blue-600 px-6 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+              className="rounded-lg bg-blue-600 dark:bg-blue-500 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 transition-colors"
             >
               {loading ? t('common.saving') : category ? t('common.update') : t('common.create')}
             </button>
-          </div>
+          </ModalFooter>
         </form>
-      </div>
-    </div>
+      </ModalContent>
+    </Modal>
   );
 }

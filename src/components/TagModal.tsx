@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import type { Tag, TagInput, TagUpdate } from '../types/news';
 import { useNNewsTranslation } from '../i18n';
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalTitle,
+  ModalClose,
+} from './ui/Modal';
 
 export interface TagModalProps {
   tag?: Tag | null;
@@ -39,21 +48,16 @@ export function TagModal({
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-
     if (!title.trim()) {
       newErrors.title = t('validation.titleRequired');
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     const tagData = {
       title: title.trim(),
@@ -72,72 +76,78 @@ export function TagModal({
     }
   };
 
-  if (!isOpen) return null;
+  const handleOpenChange = (open: boolean) => {
+    if (!open) onClose();
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-        <h2 className="mb-4 text-2xl font-bold text-gray-900">
-          {tag ? t('tagModal.editTag') : t('tagModal.createTag')}
-        </h2>
+    <Modal open={isOpen} onOpenChange={handleOpenChange}>
+      <ModalContent className="max-w-md">
+        <ModalHeader>
+          <ModalTitle>
+            {tag ? t('tagModal.editTag') : t('tagModal.createTag')}
+          </ModalTitle>
+        </ModalHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Title */}
-          <div className="space-y-2">
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-              {t('common.titleRequired')}
-            </label>
-            <input
-              id="title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className={`w-full rounded-md border ${
-                errors.title ? 'border-red-300' : 'border-gray-300'
-              } px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
-              placeholder={t('tagModal.enterTitle')}
-            />
-            {errors.title && <p className="text-sm text-red-600">{errors.title}</p>}
-          </div>
+        <form onSubmit={handleSubmit}>
+          <ModalBody>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="tag-title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('common.titleRequired')}
+                </label>
+                <input
+                  id="tag-title"
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className={`w-full rounded-lg border ${
+                    errors.title ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'
+                  } px-4 py-2.5 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 placeholder:text-gray-400 dark:placeholder:text-gray-500`}
+                  placeholder={t('tagModal.enterTitle')}
+                />
+                {errors.title && <p className="text-sm text-red-600 dark:text-red-400">{errors.title}</p>}
+              </div>
 
-          {/* Slug */}
-          <div className="space-y-2">
-            <label htmlFor="slug" className="block text-sm font-medium text-gray-700">
-              {t('common.slug')}
-            </label>
-            <input
-              id="slug"
-              type="text"
-              value={slug}
-              onChange={(e) => setSlug(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              placeholder={t('tagModal.slugPlaceholder')}
-            />
-            <p className="text-xs text-gray-500">
-              {t('tagModal.slugHint')}
-            </p>
-          </div>
+              <div className="space-y-2">
+                <label htmlFor="tag-slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('common.slug')}
+                </label>
+                <input
+                  id="tag-slug"
+                  type="text"
+                  value={slug}
+                  onChange={(e) => setSlug(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2.5 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                  placeholder={t('tagModal.slugPlaceholder')}
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {t('tagModal.slugHint')}
+                </p>
+              </div>
+            </div>
+          </ModalBody>
 
-          {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={loading}
-              className="rounded-md border border-gray-300 px-6 py-2 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-            >
-              {t('common.cancel')}
-            </button>
+          <ModalFooter>
+            <ModalClose asChild>
+              <button
+                type="button"
+                disabled={loading}
+                className="rounded-lg border border-gray-300 dark:border-gray-600 px-6 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
+              >
+                {t('common.cancel')}
+              </button>
+            </ModalClose>
             <button
               type="submit"
               disabled={loading}
-              className="rounded-md bg-blue-600 px-6 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+              className="rounded-lg bg-blue-600 dark:bg-blue-500 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 transition-colors"
             >
               {loading ? t('common.saving') : tag ? t('common.update') : t('common.create')}
             </button>
-          </div>
+          </ModalFooter>
         </form>
-      </div>
-    </div>
+      </ModalContent>
+    </Modal>
   );
 }

@@ -3,9 +3,9 @@ import { Navbar } from './Navbar';
 
 export function Layout() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
         <Outlet />
       </main>
     </div>

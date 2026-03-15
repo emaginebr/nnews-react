@@ -32,15 +32,15 @@ export function TagList({
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-gray-500">{t('tagList.loadingTags')}</div>
+        <div className="text-gray-500 dark:text-gray-400">{t('tagList.loadingTags')}</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-md bg-red-50 p-4">
-        <div className="text-sm text-red-800">
+      <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4">
+        <div className="text-sm text-red-800 dark:text-red-300">
           {t('tagList.errorLoading', { message: error.message })}
         </div>
       </div>
@@ -50,7 +50,7 @@ export function TagList({
   if (tags.length === 0) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-gray-500">{displayEmpty}</div>
+        <div className="text-gray-500 dark:text-gray-400">{displayEmpty}</div>
       </div>
     );
   }
@@ -60,11 +60,11 @@ export function TagList({
       {tags.map((tag) => (
         <div
           key={tag.tagId}
-          className="group relative flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 shadow-sm hover:shadow-md transition-shadow"
+          className="group relative flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 shadow-sm hover:shadow-md transition-shadow"
         >
           <span
-            className={`text-sm font-medium text-gray-900 ${
-              onTagClick ? 'cursor-pointer hover:text-blue-600' : ''
+            className={`text-sm font-medium text-gray-900 dark:text-gray-100 ${
+              onTagClick ? 'cursor-pointer hover:text-blue-600 dark:hover:text-blue-400' : ''
             }`}
             onClick={() => onTagClick?.(tag)}
           >
@@ -72,7 +72,7 @@ export function TagList({
           </span>
 
           {tag.articleCount !== undefined && (
-            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+            <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
               {tag.articleCount}
             </span>
           )}
@@ -82,7 +82,7 @@ export function TagList({
               {onEditClick && (
                 <button
                   onClick={() => onEditClick(tag)}
-                  className="rounded p-1 text-blue-600 hover:bg-blue-50 transition-colors"
+                  className="rounded p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
                   title={t('common.edit')}
                 >
                   <Edit2 className="h-4 w-4" />
@@ -91,7 +91,7 @@ export function TagList({
               {onMergeClick && (
                 <button
                   onClick={() => onMergeClick(tag)}
-                  className="rounded p-1 text-purple-600 hover:bg-purple-50 transition-colors"
+                  className="rounded p-1 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors"
                   title={t('tagList.merge')}
                 >
                   <GitMerge className="h-4 w-4" />
@@ -100,7 +100,7 @@ export function TagList({
               {onDeleteClick && (
                 <button
                   onClick={() => onDeleteClick(tag)}
-                  className="rounded p-1 text-red-600 hover:bg-red-50 transition-colors"
+                  className="rounded p-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
                   title={t('common.delete')}
                 >
                   <Trash2 className="h-4 w-4" />

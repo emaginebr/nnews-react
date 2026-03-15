@@ -8,6 +8,7 @@ export interface ArticleListProps {
   onArticleClick?: (article: Article) => void;
   onEditClick?: (article: Article) => void;
   onAIClick?: (article: Article) => void;
+  onDeleteClick?: (article: Article) => void;
   showActions?: boolean;
   emptyMessage?: string;
 }
@@ -19,6 +20,7 @@ export function ArticleList({
   onArticleClick,
   onEditClick,
   onAIClick,
+  onDeleteClick,
   showActions = false,
   emptyMessage,
 }: ArticleListProps) {
@@ -61,21 +63,36 @@ export function ArticleList({
             className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col"
           >
             {/* Featured Image */}
-            {article.imageName && (
-              <div
-                className={`w-full h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden ${
-                  onArticleClick ? 'cursor-pointer' : ''
-                }`}
-                onClick={() => onArticleClick?.(article)}
-              >
+            <div
+              className={`w-full h-[250px] bg-gray-200 dark:bg-gray-700 overflow-hidden ${
+                onArticleClick ? 'cursor-pointer' : ''
+              }`}
+              onClick={() => onArticleClick?.(article)}
+            >
+              {article.imageName ? (
                 <img
                   src={article.imageName}
                   alt={article.title}
                   className="w-full h-[250px] object-cover hover:scale-105 transition-transform duration-300"
-                  style={{ height: '250px' }}
                 />
-              </div>
-            )}
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <svg
+                    className="w-16 h-16 text-gray-300 dark:text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"
+                    />
+                  </svg>
+                </div>
+              )}
+            </div>
 
             <div className="p-6 flex-1 flex flex-col">
               <div className="flex-1">
@@ -170,7 +187,7 @@ export function ArticleList({
                 )}
               </div>
 
-              {showActions && (onEditClick || onAIClick) && (
+              {showActions && (onEditClick || onAIClick || onDeleteClick) && (
                 <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex gap-2 justify-end">
                   {onAIClick && (
                     <button
@@ -210,6 +227,27 @@ export function ArticleList({
                           strokeLinejoin="round"
                           strokeWidth={2}
                           d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                  {onDeleteClick && (
+                    <button
+                      onClick={() => onDeleteClick(article)}
+                      className="rounded p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                      title={t('common.delete')}
+                    >
+                      <svg
+                        className="h-5 w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                         />
                       </svg>
                     </button>

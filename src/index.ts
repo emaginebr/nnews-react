@@ -42,6 +42,9 @@ export { Button } from './components/ui/button';
 export { Input } from './components/ui/input';
 export { Label } from './components/ui/label';
 export { Avatar, AvatarImage, AvatarFallback } from './components/ui/avatar';
+export { Modal, ModalPortal, ModalOverlay, ModalTrigger, ModalClose, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalTitle, ModalDescription } from './components/ui/Modal';
+export { ConfirmModal } from './components/ui/ConfirmModal';
+export type { ConfirmModalProps } from './components/ui/ConfirmModal';
 
 // News Types
 export type {
@@ -71,6 +74,7 @@ export type { TagMergeProps } from './components/TagMerge';
 export type { AIArticleGeneratorProps } from './components/AIArticleGenerator';
 
 export { ArticleStatus, ContentType } from './types/news';
+export type { NNewsTheme, NNewsThemeMode } from './types/news';
 
 // Utility Functions
 export {
